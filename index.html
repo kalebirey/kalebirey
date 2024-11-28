@@ -4,7 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocabulary Review</title>
-    <link rel="stylesheet" href="https://github.com/kalebirey/kalebirey.github.io/blob/main/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f3f3;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: #6200ea;
+            color: white;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-container {
+            display: flex;
+            gap: 20px;
+            margin: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .card {
+            width: 150px;
+            height: 100px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .flashcard-view {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 300px;
+            z-index: 1000;
+        }
+
+        .flashcard {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #6200ea;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #6200ea;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #4500b5;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            background: none;
+            color: #6200ea;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
 <body>
     <header>
         <h1>Vocabulary Review App</h1>
@@ -24,6 +118,54 @@
             <button class="next-btn" id="nextFlashcard">Next →</button>
         </div>
     </main>
-    <script src="https://github.com/kalebirey/kalebirey.github.io/blob/main/script.js"></script>
+    <script>
+        const flashcardView = document.getElementById('flashcardView');
+        const flashcardContent = document.getElementById('flashcardContent');
+        const closeFlashcards = document.getElementById('closeFlashcards');
+        const prevFlashcard = document.getElementById('prevFlashcard');
+        const nextFlashcard = document.getElementById('nextFlashcard');
+
+        // Example flashcard data
+        const flashcardSets = {
+            set1: ["Word 1 - Definition 1", "Word 2 - Definition 2", "Word 3 - Definition 3"],
+            set2: ["Word A - Definition A", "Word B - Definition B", "Word C - Definition C"],
+            set3: ["Word X - Definition X", "Word Y - Definition Y", "Word Z - Definition Z"]
+        };
+
+        let currentSet = [];
+        let currentIndex = 0;
+
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', () => {
+                const setKey = card.getAttribute('data-set');
+                currentSet = flashcardSets[setKey] || [];
+                currentIndex = 0;
+                showFlashcard();
+            });
+        });
+
+        function showFlashcard() {
+            flashcardContent.textContent = currentSet[currentIndex] || "No flashcards available.";
+            flashcardView.style.display = 'block';
+        }
+
+        closeFlashcards.addEventListener('click', () => {
+            flashcardView.style.display = 'none';
+        });
+
+        prevFlashcard.addEventListener('click', () => {
+            if (currentSet.length > 0) {
+                currentIndex = (currentIndex - 1 + currentSet.length) % currentSet.length;
+                showFlashcard();
+            }
+        });
+
+        nextFlashcard.addEventListener('click', () => {
+            if (currentSet.length > 0) {
+                currentIndex = (currentIndex + 1) % currentSet.length;
+                showFlashcard();
+            }
+        });
+    </script>
 </body>
 </html>
