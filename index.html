@@ -9,133 +9,65 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f3f3f3;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background: #f7f7f7;
         }
 
-        header {
-            background-color: #6200ea;
+        .header {
+            background-color: #6a0dad;
             color: white;
-            padding: 20px;
-            width: 100%;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            padding: 20px 0;
         }
 
-        .card-container {
-            display: flex;
-            gap: 20px;
-            margin: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .card {
-            width: 150px;
-            height: 100px;
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .set-container {
             display: flex;
             justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s;
-            position: relative;
+            gap: 10px;
+            padding: 20px;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .card.selected {
-            background-color: #6200ea;
-            color: white;
-            border-color: #6200ea;
-        }
-
-        .card::after {
-            content: "✔";
-            font-size: 20px;
-            color: white;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: none;
-        }
-
-        .card.selected::after {
-            display: block;
-        }
-
-        .start-review {
+        .set {
             padding: 10px 20px;
-            background-color: #6200ea;
-            color: white;
-            border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            background: white;
             cursor: pointer;
-            margin: 20px;
-            font-size: 16px;
-            display: none; /* Initially hidden */
-        }
-
-        .start-review.active {
-            display: block;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(5px);
-            z-index: 500;
-            display: none;
-        }
-
-        .flashcard-view {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             text-align: center;
-            width: 350px;
-            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .set.selected {
+            background-color: #6a0dad;
+            color: white;
         }
 
         .flashcard-container {
             position: relative;
-            perspective: 1000px;
-            margin-bottom: 20px; /* Ensures there’s space for buttons below */
+            text-align: center;
+            margin-top: 50px;
         }
 
         .flashcard {
-            width: 100%;
-            height: 150px;
-            border-radius: 10px;
-            background-color: white;
-            color: #6200ea;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: relative;
-            transform-style: preserve-3d;
-            transform: rotateY(0);
-            transition: transform 0.6s;
+            width: 300px;
+            height: 200px;
+            margin: 0 auto;
+            perspective: 1000px;
+            cursor: pointer;
         }
 
-        .flashcard.flipped {
+        .flashcard-inner {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            border-radius: 8px;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .flashcard.flipped .flashcard-inner {
             transform: rotateY(180deg);
         }
 
@@ -147,147 +79,131 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 10px;
+            border-radius: 8px;
+        }
+
+        .flashcard-front {
+            background-color: white;
+            color: #6a0dad;
         }
 
         .flashcard-back {
+            background-color: #f1f1f1;
             transform: rotateY(180deg);
-            background-color: #f0f0f0;
+            color: #333;
         }
 
-        .button-container {
+        .flashcard-set-info {
+            font-size: 14px;
+            margin-top: 10px;
+            color: #777;
+        }
+
+        .buttons {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             gap: 10px;
-            margin-top: 20px; /* Prevent overlap with the flashcard */
+            margin-top: 20px;
         }
 
         button {
             padding: 10px 20px;
-            border: none;
-            background-color: #6200ea;
+            background-color: #6a0dad;
             color: white;
-            border-radius: 5px;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
         }
 
         button:hover {
-            background-color: #4500b5;
+            transform: scale(1.05);
         }
 
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 20px;
-            background: none;
-            color: #6200ea;
-            border: none;
-            cursor: pointer;
-            z-index: 1100;
+        .toggle-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .toggle-container input {
+            margin-left: 10px;
         }
     </style>
 </head>
 <body>
-    <header>
+    <div class="header">
         <h1>Greek Vocab</h1>
-    </header>
-    <main>
-        <div class="card-container">
-            <div class="card" data-set="set1">Set 1</div>
-            <div class="card" data-set="set2">Set 2</div>
-            <div class="card" data-set="set3">Set 3</div>
-        </div>
-        <button class="start-review" id="startReview">Start Review</button>
-        <div class="overlay" id="overlay"></div>
-        <div class="flashcard-view" id="flashcardView">
-            <button class="close-btn" id="closeFlashcards">×</button>
-            <div class="flashcard-container">
-                <div class="flashcard" id="flashcard">
-                    <div class="flashcard-front" id="flashcardFront">Front</div>
-                    <div class="flashcard-back" id="flashcardBack">Back</div>
-                </div>
-            </div>
-            <div class="button-container">
-                <button id="prevFlashcard">← Previous</button>
-                <button id="flipFlashcard">Flip</button>
-                <button id="nextFlashcard">Next →</button>
+    </div>
+
+    <div class="toggle-container">
+        <label for="randomizeToggle">Randomize Word Order</label>
+        <input type="checkbox" id="randomizeToggle">
+    </div>
+
+    <div class="set-container">
+        <div class="set" data-set="Set 1">Set 1</div>
+        <div class="set" data-set="Set 2">Set 2</div>
+        <div class="set" data-set="Set 3">Set 3</div>
+    </div>
+
+    <div class="flashcard-container">
+        <div class="flashcard" id="flashcard">
+            <div class="flashcard-inner">
+                <div class="flashcard-front" id="flashcardFront">Word</div>
+                <div class="flashcard-back" id="flashcardBack">Definition</div>
             </div>
         </div>
-    </main>
+        <div class="flashcard-set-info" id="flashcardSetInfo"></div>
+    </div>
+
+    <div class="buttons">
+        <button id="prevFlashcard">Previous</button>
+        <button id="flipFlashcard">Flip</button>
+        <button id="nextFlashcard">Next</button>
+    </div>
+
     <script>
         const sets = {
-            set1: [
-                { word: "Word 1", definition: "Definition 1" },
-                { word: "Word 2", definition: "Definition 2" }
+            "Set 1": [
+                { word: "λόγος", definition: "word, reason, discourse" },
+                { word: "ἀλήθεια", definition: "truth" },
             ],
-            set2: [
-                { word: "Word A", definition: "Definition A" },
-                { word: "Word B", definition: "Definition B" }
+            "Set 2": [
+                { word: "χάρις", definition: "grace, favor" },
+                { word: "πνεῦμα", definition: "spirit, wind, breath" },
             ],
-            set3: [
-                { word: "Word X", definition: "Definition X" },
-                { word: "Word Y", definition: "Definition Y" }
-            ]
+            "Set 3": [
+                { word: "ἄνθρωπος", definition: "man, person" },
+                { word: "θεός", definition: "god" },
+            ],
         };
 
-        const selectedSets = new Set();
-        const cards = document.querySelectorAll('.card');
-        const startReviewButton = document.getElementById('startReview');
-        const flashcardView = document.getElementById('flashcardView');
-        const overlay = document.getElementById('overlay');
-        const closeFlashcards = document.getElementById('closeFlashcards');
-
+        let selectedSets = [];
         let currentSet = [];
         let currentIndex = 0;
+        let randomize = false;
 
-        // Select/Deselect sets
-        cards.forEach(card => {
-            card.addEventListener('click', () => {
-                const setKey = card.dataset.set;
-                if (selectedSets.has(setKey)) {
-                    selectedSets.delete(setKey);
-                    card.classList.remove('selected');
+        document.querySelectorAll('.set').forEach(setEl => {
+            setEl.addEventListener('click', () => {
+                const setName = setEl.dataset.set;
+                if (selectedSets.includes(setName)) {
+                    selectedSets = selectedSets.filter(set => set !== setName);
+                    setEl.classList.remove('selected');
                 } else {
-                    selectedSets.add(setKey);
-                    card.classList.add('selected');
+                    selectedSets.push(setName);
+                    setEl.classList.add('selected');
                 }
-                updateStartButton();
             });
         });
 
-        // Update Start Review button
-        function updateStartButton() {
-            if (selectedSets.size > 0) {
-                startReviewButton.classList.add('active');
-            } else {
-                startReviewButton.classList.remove('active');
-            }
-        }
-
-        // Start Review
-        startReviewButton.addEventListener('click', () => {
-            currentSet = Array.from(selectedSets).flatMap(setKey => sets[setKey]);
-            currentIndex = 0;
-            if (currentSet.length > 0) {
-                updateFlashcard();
-                overlay.style.display = 'block';
-                flashcardView.style.display = 'block';
-            }
+        document.getElementById('randomizeToggle').addEventListener('change', (e) => {
+            randomize = e.target.checked;
         });
 
-        // Flashcard controls
-        closeFlashcards.addEventListener('click', () => {
-            overlay.style.display = 'none';
-            flashcardView.style.display = 'none';
+        document.getElementById('flipFlashcard').addEventListener('click', () => {
+            document.getElementById('flashcard').classList.toggle('flipped');
         });
-
-function updateFlashcard() {
-            const currentCard = currentSet[currentIndex];
-            document.getElementById('flashcardFront').textContent = currentCard.word;
-            document.getElementById('flashcardBack').textContent = currentCard.definition;
-            document.getElementById('flashcard').classList.remove('flipped');
-        }
 
         document.getElementById('prevFlashcard').addEventListener('click', () => {
             if (currentSet.length > 0) {
@@ -303,9 +219,31 @@ function updateFlashcard() {
             }
         });
 
-        document.getElementById('flipFlashcard').addEventListener('click', () => {
-            document.getElementById('flashcard').classList.toggle('flipped');
+        document.body.addEventListener('keydown', event => {
+            if (event.key === "ArrowRight") document.getElementById('nextFlashcard').click();
         });
+
+        function startReview() {
+            currentSet = selectedSets.flatMap(setName => sets[setName]);
+            if (randomize) currentSet = currentSet.sort(() => Math.random() - 0.5);
+            currentIndex = 0;
+            updateFlashcard();
+        }
+
+        function updateFlashcard() {
+            if (currentSet.length === 0) return;
+            const currentCard = currentSet[currentIndex];
+            document.getElementById('flashcardFront').textContent = currentCard.word;
+            document.getElementById('flashcardBack').textContent = currentCard.definition;
+            document.getElementById('flashcardSetInfo').textContent = `From: ${getSetName(currentCard.word)}`;
+            document.getElementById('flashcard').classList.remove('flipped');
+        }
+
+        function getSetName(word) {
+            for (let setName in sets) {
+                if (sets[setName].some(card => card.word === word)) return setName;
+            }
+        }
     </script>
 </body>
 </html>
