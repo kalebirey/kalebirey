@@ -1,7 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Review</title>
+    <link rel="stylesheet" href="styles.css">
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+    <header>
+        <h1>Vocabulary Review App</h1>
+    </header>
+    <main>
+        <div class="card-container">
+            <div class="card" data-set="set1">Set 1</div>
+            <div class="card" data-set="set2">Set 2</div>
+            <div class="card" data-set="set3">Set 3</div>
+        </div>
+        <div class="flashcard-view" id="flashcardView">
+            <button class="close-btn" id="closeFlashcards">×</button>
+            <div class="flashcard" id="flashcard">
+                <p id="flashcardContent">Click a set to view flashcards.</p>
+            </div>
+            <button class="prev-btn" id="prevFlashcard">← Previous</button>
+            <button class="next-btn" id="nextFlashcard">Next →</button>
+        </div>
+    </main>
+    <script src="script.js"></script>
 </body>
 </html>
