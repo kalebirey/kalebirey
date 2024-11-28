@@ -44,12 +44,49 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s;
+            position: relative;
         }
 
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .card.selected {
+            background-color: #6200ea;
+            color: white;
+            border-color: #6200ea;
+        }
+
+        .card::after {
+            content: "✔";
+            font-size: 20px;
+            color: white;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+        }
+
+        .card.selected::after {
+            display: block;
+        }
+
+        .start-review {
+            padding: 10px 20px;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 20px;
+            font-size: 16px;
+            display: none; /* Initially hidden */
+        }
+
+        .start-review.active {
+            display: block;
         }
 
         .overlay {
@@ -161,6 +198,7 @@
             <div class="card" data-set="set2">Set 2</div>
             <div class="card" data-set="set3">Set 3</div>
         </div>
+        <button class="start-review" id="startReview">Start Review</button>
         <div class="overlay" id="overlay"></div>
         <div class="flashcard-view" id="flashcardView">
             <button class="close-btn" id="closeFlashcards">×</button>
@@ -178,77 +216,96 @@
         </div>
     </main>
     <script>
-        const overlay = document.getElementById('overlay');
-        const flashcardView = document.getElementById('flashcardView');
-        const flashcard = document.getElementById('flashcard');
-        const flashcardFront = document.getElementById('flashcardFront');
-        const flashcardBack = document.getElementById('flashcardBack');
-        const closeFlashcards = document.getElementById('closeFlashcards');
-        const prevFlashcard = document.getElementById('prevFlashcard');
-        const nextFlashcard = document.getElementById('nextFlashcard');
-        const flipFlashcard = document.getElementById('flipFlashcard');
-
-        const flashcardSets = {
+        const sets = {
             set1: [
                 { word: "Word 1", definition: "Definition 1" },
-                { word: "Word 2", definition: "Definition 2" },
-                { word: "Word 3", definition: "Definition 3" }
+                { word: "Word 2", definition: "Definition 2" }
             ],
             set2: [
                 { word: "Word A", definition: "Definition A" },
-                { word: "Word B", definition: "Definition B" },
-                { word: "Word C", definition: "Definition C" }
+                { word: "Word B", definition: "Definition B" }
             ],
             set3: [
                 { word: "Word X", definition: "Definition X" },
-                { word: "Word Y", definition: "Definition Y" },
-                { word: "Word Z", definition: "Definition Z" }
+                { word: "Word Y", definition: "Definition Y" }
             ]
         };
+
+        const selectedSets = new Set();
+        const cards = document.querySelectorAll('.card');
+        const startReviewButton = document.getElementById('startReview');
+        const flashcardView = document.getElementById('flashcardView');
+        const overlay = document.getElementById('overlay');
+        const closeFlashcards = document.getElementById('closeFlashcards');
 
         let currentSet = [];
         let currentIndex = 0;
 
-        document.querySelectorAll('.card').forEach(card => {
+        // Select/Deselect sets
+        cards.forEach(card => {
             card.addEventListener('click', () => {
-                const setKey = card.getAttribute('data-set');
-                currentSet = flashcardSets[setKey] || [];
-                currentIndex = 0;
-                updateFlashcard();
-                overlay.style.display = 'block';
-                flashcardView.style.display = 'block';
+                const setKey = card.dataset.set;
+                if (selectedSets.has(setKey)) {
+                    selectedSets.delete(setKey);
+                    card.classList.remove('selected');
+                } else {
+                    selectedSets.add(setKey);
+                    card.classList.add('selected');
+                }
+                updateStartButton();
             });
         });
 
+        // Update Start Review button
+        function updateStartButton() {
+            if (selectedSets.size > 0) {
+                startReviewButton.classList.add('active');
+            } else {
+                startReviewButton.classList.remove('active');
+            }
+        }
+
+        // Start Review
+        startReviewButton.addEventListener('click', () => {
+            currentSet = Array.from(selectedSets).flatMap(setKey => sets[setKey]);
+            currentIndex = 0;
+            if (currentSet.length > 0) {
+                updateFlashcard();
+                overlay.style.display = 'block';
+                flashcardView.style.display = 'block';
+            }
+        });
+
+        // Flashcard controls
         closeFlashcards.addEventListener('click', () => {
             overlay.style.display = 'none';
             flashcardView.style.display = 'none';
         });
 
-        prevFlashcard.addEventListener('click', () => {
+function updateFlashcard() {
+            const currentCard = currentSet[currentIndex];
+            document.getElementById('flashcardFront').textContent = currentCard.word;
+            document.getElementById('flashcardBack').textContent = currentCard.definition;
+            document.getElementById('flashcard').classList.remove('flipped');
+        }
+
+        document.getElementById('prevFlashcard').addEventListener('click', () => {
             if (currentSet.length > 0) {
                 currentIndex = (currentIndex - 1 + currentSet.length) % currentSet.length;
                 updateFlashcard();
             }
         });
 
-        nextFlashcard.addEventListener('click', () => {
+        document.getElementById('nextFlashcard').addEventListener('click', () => {
             if (currentSet.length > 0) {
                 currentIndex = (currentIndex + 1) % currentSet.length;
                 updateFlashcard();
             }
         });
 
-        flipFlashcard.addEventListener('click', () => {
-            flashcard.classList.toggle('flipped');
+        document.getElementById('flipFlashcard').addEventListener('click', () => {
+            document.getElementById('flashcard').classList.toggle('flipped');
         });
-
-        function updateFlashcard() {
-            const currentCard = currentSet[currentIndex];
-            flashcardFront.textContent = currentCard.word;
-            flashcardBack.textContent = currentCard.definition;
-            flashcard.classList.remove('flipped');
-        }
     </script>
 </body>
 </html>
