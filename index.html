@@ -7,276 +7,189 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
+            padding: 20px;
+            background-color: #f4f4f9;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-        }
-
-        .flashcard-container {
-            display: none;
             flex-direction: column;
-            align-items: center;
-            margin: 20px;
-            width: 300px;
         }
-
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
         .flashcard {
-            position: relative;
-            width: 200px;
-            height: 300px;
+            width: 150px;
+            height: 200px;
             background-color: #fff;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-            transform-style: preserve-3d;
-            transition: transform 0.6s;
-        }
-
-        .flashcard.flipped {
-            transform: rotateY(180deg);
-        }
-
-        .flashcard .front, .flashcard .back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
-            color: #333;
+            cursor: pointer;
+            position: relative;
+            perspective: 1000px;
         }
-
-        .flashcard .back {
+        .flashcard-inner {
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+        .flashcard.flipped .flashcard-inner {
             transform: rotateY(180deg);
-            background-color: #f3f3f3;
         }
-
-        .flashcard-info {
-            font-size: 14px;
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            backface-visibility: hidden;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .button {
+            background-color: #6a0dad;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:disabled {
+            background-color: #ccc;
+        }
+        .progress-bar {
+            height: 5px;
+            background-color: #f4f4f9;
+            border-radius: 5px;
             margin-top: 10px;
-            color: #777;
-        }
-
-        .progress-bar-container {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 5px;
-            background-color: rgba(0, 0, 0, 0.1);
-            z-index: 10;
         }
-
-        .progress-bar {
+        .progress-bar .progress {
             height: 100%;
-            background-color: #4CAF50;
-            width: 0%;
-        }
-
-        .button {
-            background-color: #6c63ff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin: 5px;
+            background-color: #6a0dad;
+            width: 0;
             border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
         }
-
-        .button:hover {
-            background-color: #5a54e3;
-        }
-
-        .button.pause-resume {
-            background-color: #ff9800;
-        }
-
-        .button.pause-resume:hover {
-            background-color: #e68900;
-        }
-
-        .button.close {
-            background-color: #ff5722;
-        }
-
-        .button.close:hover {
-            background-color: #e64a19;
-        }
-
-        .hidden {
-            display: none;
-        }
-
         .options-section {
-            margin-top: 20px;
+            margin-top: 30px;
             text-align: center;
         }
-
         .option-toggle {
-            margin: 10px;
+            margin-left: 10px;
         }
-
-        .option-label {
-            font-size: 14px;
-            margin-right: 10px;
+        .active {
+            background-color: #4caf50;
         }
-
-        .toggle {
-            display: inline-block;
-            position: relative;
-            width: 50px;
-            height: 25px;
-            background-color: #ccc;
-            border-radius: 25px;
-            cursor: pointer;
-        }
-
-        .toggle .inner-circle {
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 20px;
-            height: 20px;
-            background-color: #fff;
-            border-radius: 50%;
-            transition: transform 0.3s ease;
-        }
-
-        .toggle.active {
-            background-color: #6c63ff;
-        }
-
-        .toggle.active .inner-circle {
-            transform: translateX(25px);
-        }
-
     </style>
 </head>
 <body>
-
-<!-- Flashcards Container -->
-<div class="flashcard-container">
-    <div class="flashcard" id="flashcard">
-        <div class="front">Word</div>
-        <div class="back">Definition</div>
-        <div class="progress-bar-container">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
+    <h1>Greek Vocab</h1>
+    <div class="card-container" id="flashcardContainer">
+        <!-- Flashcards will be dynamically inserted here -->
     </div>
-    <div class="flashcard-info" id="flashcardInfo">Set: Vocabulary Set</div>
-    <div class="flashcard-buttons">
-        <button class="button" id="prevCard">Previous</button>
-        <button class="button" id="flipCard">Flip</button>
-        <button class="button" id="nextCard">Next</button>
-        <button class="button pause-resume" id="pauseResumeBtn">Pause</button>
-        <button class="button close" id="closeFlashcards">Close</button>
+
+    <div class="buttons">
+        <button class="button" id="prevCardBtn" disabled>Previous</button>
+        <button class="button" id="flipCardBtn">Flip</button>
+        <button class="button" id="nextCardBtn" disabled>Next</button>
     </div>
-</div>
 
-<!-- Options Section -->
-<div class="options-section">
-    <h3>Options</h3>
-    <label for="randomizeToggle" class="option-label">Randomize</label>
-    <div class="toggle" id="randomizeToggle"></div>
-    <br>
-    <label for="automaticToggle" class="option-label">Automatic</label>
-    <div class="toggle" id="automaticToggle"></div>
-    <br>
-    <input type="number" id="intervalInput" value="3" class="option-toggle" min="1"> seconds per card
-</div>
+    <div class="options-section">
+        <label for="automaticToggle" class="button option-toggle">
+            Automatic <input type="checkbox" id="automaticToggle" class="option-toggle">
+        </label>
+        <label for="intervalInput" class="button option-toggle">
+            Interval (seconds): <input type="number" id="intervalInput" value="3" class="option-toggle" min="1">
+        </label>
+        <label for="randomizeToggle" class="button option-toggle">
+            Randomize <input type="checkbox" id="randomizeToggle" class="option-toggle">
+        </label>
+    </div>
 
-<!-- Buttons to select sets -->
-<div class="sets-container">
-    <div class="set-card" data-set="0">Set 1</div>
-    <div class="set-card" data-set="1">Set 2</div>
-    <div class="set-card" data-set="2">Set 3</div>
-    <div class="set-card" data-set="3">Set 4</div>
-    <div class="set-card" data-set="4">Set 5</div>
-</div>
+    <script>
+        // Sample word sets for now
+        const wordSets = [
+            { name: "Set 1", words: [{ word: "Λόγος", definition: "Word" }, { word: "Σοφία", definition: "Wisdom" }] },
+            { name: "Set 2", words: [{ word: "Φιλία", definition: "Friendship" }, { word: "Πόλη", definition: "City" }] },
+            { name: "Set 3", words: [{ word: "Χρόνος", definition: "Time" }, { word: "Διαρκής", definition: "Continuous" }] },
+            { name: "Set 4", words: [{ word: "Έκρηξη", definition: "Explosion" }, { word: "Κατοικία", definition: "Dwelling" }] },
+            { name: "Set 5", words: [{ word: "Αλήθεια", definition: "Truth" }, { word: "Αγάπη", definition: "Love" }] }
+        ];
 
-<!-- Start Review Button -->
-<button class="button" id="startReview">Start Review</button>
+        let selectedSets = [];
+        let currentCards = [];
+        let currentIndex = 0;
+        let isFlipped = false;
+        let isAutomatic = false;
+        let intervalTime = 3000; // Default 3 seconds
+        let progress = 0;
+        let autoInterval = null;
 
-<script>
-    const sets = {
-        0: [{ word: 'αγάπη', definition: 'love' }, { word: 'λύκος', definition: 'wolf' }, { word: 'πόλη', definition: 'city' }],
-        1: [{ word: 'θάλασσα', definition: 'sea' }, { word: 'οδός', definition: 'road' }, { word: 'καλός', definition: 'good' }],
-        2: [{ word: 'ήλιος', definition: 'sun' }, { word: 'άστρο', definition: 'star' }, { word: 'βουνό', definition: 'mountain' }],
-        3: [{ word: 'πόλεμος', definition: 'war' }, { word: 'ειρήνη', definition: 'peace' }, { word: 'πόλεως', definition: 'city (genitive)' }],
-        4: [{ word: 'βίβλος', definition: 'book' }, { word: 'λόγος', definition: 'word' }, { word: 'άγγελος', definition: 'angel' }]
-    };
+        function updateButtons() {
+            document.getElementById('prevCardBtn').disabled = currentIndex === 0;
+            document.getElementById('nextCardBtn').disabled = currentIndex === currentCards.length - 1;
+        }
 
-    let selectedSets = [];
-    let currentCards = [];
-    let currentIndex = 0;
-    let intervalTime = 3000; // 3 seconds for each side
-    let autoInterval;
-    let automatic = false;
-    let isPaused = false;
-    let progress = 0;
-    
-    // Set up selection for sets
-    document.querySelectorAll('.set-card').forEach(card => {
-        card.addEventListener('click', () => {
-            card.classList.toggle('selected');
-            const setIndex = card.getAttribute('data-set');
-            if (card.classList.contains('selected')) {
-                selectedSets.push(setIndex);
-            } else {
-                selectedSets = selectedSets.filter(set => set !== setIndex);
-            }
-        });
-    });
+        function renderFlashcards() {
+            const flashcardContainer = document.getElementById('flashcardContainer');
+            flashcardContainer.innerHTML = ''; // Clear any previous cards
 
-    document.getElementById('startReview').addEventListener('click', () => {
-        if (selectedSets.length > 0) {
-            currentCards = [];
-            selectedSets.forEach(setIndex => {
-                currentCards = currentCards.concat(sets[setIndex]);
+            currentCards.forEach((card, index) => {
+                const flashcardDiv = document.createElement('div');
+                flashcardDiv.classList.add('flashcard');
+                flashcardDiv.setAttribute('data-index', index);
+
+                const flashcardInner = document.createElement('div');
+                flashcardInner.classList.add('flashcard-inner');
+
+                const front = document.createElement('div');
+                front.classList.add('flashcard-front');
+                front.innerHTML = card.word;
+
+                const back = document.createElement('div');
+                back.classList.add('flashcard-back');
+                back.innerHTML = card.definition;
+
+                flashcardInner.appendChild(front);
+                flashcardInner.appendChild(back);
+                flashcardDiv.appendChild(flashcardInner);
+
+                flashcardDiv.addEventListener('click', function() {
+                    flashcardDiv.classList.toggle('flipped');
+                });
+
+                flashcardContainer.appendChild(flashcardDiv);
             });
-            if (document.getElementById('randomizeToggle').classList.contains('active')) {
-                currentCards.sort(() => Math.random() - 0.5);
-            }
-            currentIndex = 0;
-            showFlashcard();
-            document.querySelector('.flashcard-container').style.display = 'flex';
         }
-    });
 
-    function showFlashcard() {
-        const card = currentCards[currentIndex];
-        document.querySelector('.flashcard .front').textContent = card.word;
-        document.querySelector('.flashcard .back').textContent = card.definition;
-        document.getElementById('flashcardInfo').textContent = `Set: Set ${selectedSets.join(', ')}`;
-
-        // Reset progress bar
-        document.getElementById('progressBar').style.width = '0%';
-
-        // Flip to "word" side initially
-        document.querySelector('.flashcard').classList.remove('flipped');
-
-        // Start automatic mode if enabled
-        if (automatic) {
-            startTimer();
-        }
-    }
-
-    // Timer functionality for automatic mode
         function startTimer() {
-            let progressBar = document.getElementById('progressBar');
+            const flashcard = document.querySelector(`.flashcard[data-index='${currentIndex}']`);
+            const progressBar = flashcard.querySelector('.progress-bar .progress');
             progress = 0;
-            
-            // If the timer is paused, don't start a new interval
-            if (isPaused) return;
-
             clearInterval(autoInterval);
+
             autoInterval = setInterval(() => {
-                progress += 100 / (intervalTime / 100);  // 100% in the set interval time
+                progress += 100 / (intervalTime / 100); // Progress update
                 progressBar.style.width = `${progress}%`;
 
                 if (progress >= 100) {
@@ -286,72 +199,93 @@
             }, 100);
         }
 
-    // Flip card functionality
-    document.getElementById('flipCard').addEventListener('click', () => {
-        document.querySelector('.flashcard').classList.toggle('flipped');
-    });
+        function showFlashcard() {
+            const flashcard = document.querySelector(`.flashcard[data-index='${currentIndex}']`);
+            const flashcardInner = flashcard.querySelector('.flashcard-inner');
 
-    // Next card functionality
-    document.getElementById('nextCard').addEventListener('click', () => {
-        if (currentIndex < currentCards.length - 1) {
-            currentIndex++;
+            if (isAutomatic) {
+                flashcardInner.querySelector('.flashcard-front').style.display = 'flex';
+                flashcardInner.querySelector('.flashcard-back').style.display = 'none';
+                setTimeout(() => {
+                    flashcardInner.querySelector('.flashcard-front').style.display = 'none';
+                    flashcardInner.querySelector('.flashcard-back').style.display = 'flex';
+                }, intervalTime / 2);
+                startTimer();
+            } else {
+                flashcardInner.querySelector('.flashcard-back').style.display = 'none';
+                flashcardInner.querySelector('.flashcard-front').style.display = 'flex';
+            }
+
+            updateButtons();
+        }
+
+        function nextCard() {
+            if (currentIndex < currentCards.length - 1) {
+                currentIndex++;
+                showFlashcard();
+            }
+        }
+
+        function prevCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                showFlashcard();
+            }
+        }
+
+        document.getElementById('nextCardBtn').addEventListener('click', nextCard);
+        document.getElementById('prevCardBtn').addEventListener('click', prevCard);
+        document.getElementById('flipCardBtn').addEventListener('click', function() {
+            document.querySelector(`.flashcard[data-index='${currentIndex}']`).classList.toggle('flipped');
+        });
+
+        document.getElementById('automaticToggle').addEventListener('change', function() {
+            isAutomatic = this.checked;
+            if (isAutomatic) startTimer();
+            else clearInterval(autoInterval);
+        });
+
+        document.getElementById('intervalInput').addEventListener('input', function() {
+            intervalTime = this.value * 1000;
+            if (isAutomatic) {
+                clearInterval(autoInterval);
+
+startTimer();
+            }
+        });
+
+        document.getElementById('randomizeToggle').addEventListener('change', function() {
+            if (this.checked) {
+                currentCards = shuffleCards(currentCards);
+                currentIndex = 0; // Reset to first card after shuffling
+                renderFlashcards();
+                showFlashcard();
+            } else {
+                renderFlashcards();
+                showFlashcard();
+            }
+        });
+
+        function shuffleCards(cards) {
+            let shuffled = [...cards];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function initialize() {
+            // Assuming all sets are initially selected
+            selectedSets = wordSets; 
+            currentCards = selectedSets.flatMap(set => set.words);
+            currentIndex = 0;
+            renderFlashcards();
             showFlashcard();
-            if (automatic && !isPaused) startTimer();
         }
-    });
 
-    // Previous card functionality
-    document.getElementById('prevCard').addEventListener('click', () => {
-        if (currentIndex > 0) {
-            currentIndex--;
-            showFlashcard();
-            if (automatic && !isPaused) startTimer();
-        }
-    });
-
-    // Pause/Resume button functionality
-    document.getElementById('pauseResumeBtn').addEventListener('click', () => {
-        isPaused = !isPaused;
-        if (isPaused) {
-            clearInterval(autoInterval);
-            document.getElementById('pauseResumeBtn').textContent = 'Resume';
-        } else {
-            startTimer();
-            document.getElementById('pauseResumeBtn').textContent = 'Pause';
-        }
-    });
-
-    // Close button functionality
-    document.getElementById('closeFlashcards').addEventListener('click', () => {
-        document.querySelector('.flashcard-container').style.display = 'none';
-        clearInterval(autoInterval); // Stop the interval when closing
-    });
-
-    // Handle automatic toggle
-    document.getElementById('automaticToggle').addEventListener('click', () => {
-        const toggle = document.getElementById('automaticToggle');
-        toggle.classList.toggle('active');
-        automatic = toggle.classList.contains('active');
-
-        if (automatic) {
-            startTimer(); // Start the timer if automatic is on
-        } else {
-            clearInterval(autoInterval); // Stop the timer if automatic is off
-        }
-    });
-
-    // Handle randomize toggle
-    document.getElementById('randomizeToggle').addEventListener('click', () => {
-        document.getElementById('randomizeToggle').classList.toggle('active');
-    });
-
-    // Handle interval input change
-    document.getElementById('intervalInput').addEventListener('input', (e) => {
-        intervalTime = parseInt(e.target.value) * 1000; // Convert to milliseconds
-        if (automatic && !isPaused) {
-            startTimer(); // Restart the timer with the new interval if automatic is on
-        }
-    });
-</script>
+        // Initialize the app on load
+        window.onload = initialize;
+    </script>
 </body>
 </html>
