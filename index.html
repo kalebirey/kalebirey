@@ -5,7 +5,198 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Greek Vocab</title>
   <style>
-    /* (Same styles as before, no changes) */
+    /* General styling for the page */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .header {
+      background-color: #6a1b9a;
+      color: white;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .card-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .set-card {
+      width: 100px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .set-card.selected {
+      background-color: #d1c4e9;
+      transform: scale(1.1);
+    }
+
+    .flashcard-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      backdrop-filter: blur(5px);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 10;
+    }
+
+    .flashcard {
+      width: 300px;
+      height: 200px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+
+    .flashcard .front, .flashcard .back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+    }
+
+    .flashcard .back {
+      transform: rotateY(180deg);
+    }
+
+    .flashcard.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .flashcard-info {
+      font-size: 12px;
+      color: gray;
+      margin-top: 10px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .options-header {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 40px;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .slider {
+      position: relative;
+      width: 50px;
+      height: 24px;
+      background-color: #ccc;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .slider:before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background-color: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    .slider.active {
+      background-color: #6a1b9a;
+    }
+
+    .slider.active:before {
+      transform: translateX(26px);
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background-color: #6a1b9a;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: #4a148c;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #e57373;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    .progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background-color: #6a1b9a;
+      width: 0%;
+      transition: width 1s linear;
+    }
+
+    .pause-resume-btn {
+      margin-top: 20px;
+      background-color: #ff7043;
+    }
   </style>
 </head>
 <body>
@@ -63,8 +254,7 @@
       4: [{ word: "Word 10", definition: "Definition 10" }, { word: "Word 11", definition: "Definition 11" }, { word: "Word 12", definition: "Definition 12" }],
       5: [{ word: "Word 13", definition: "Definition 13" }, { word: "Word 14", definition: "Definition 14" }, { word: "Word 15", definition: "Definition 15" }]
     };
-
-    let selectedSets = [];
+let selectedSets = [];
     let currentCards = [];
     let currentIndex = 0;
     let intervalTime = 3000; // 3 seconds for each side
@@ -176,6 +366,14 @@
       flashcard.querySelector('.front').textContent = cardData.word;
       flashcard.querySelector('.back').textContent = cardData.definition;
       info.textContent = `Set: ${getSetOfWord(cardData.word)}`;
+
+      // Reset progress bar
+      const progressBar = document.getElementById('progressBar');
+      progressBar.style.width = '0%';
+      setTimeout(() => {
+        progressBar.style.width = '100%';
+      }, 100);
+
     }
 
     function getSetOfWord(word) {
