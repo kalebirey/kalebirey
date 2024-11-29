@@ -1,389 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Greek Vocab</title>
-  <style>
-    /* General styling for the page */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f0f0f0;
-      color: #333;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greek Vocab</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
 
-    .header {
-      background-color: #6a1b9a;
-      color: white;
-      text-align: center;
-      padding: 20px 0;
-      font-size: 24px;
-      font-weight: bold;
-    }
+        .flashcard-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+            width: 300px;
+        }
 
-    .card-container {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 20px 0;
-    }
+        .flashcard {
+            position: relative;
+            width: 200px;
+            height: 300px;
+            background-color: #fff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
 
-    .set-card {
-      width: 100px;
-      height: 60px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      transition: transform 0.2s, background-color 0.2s;
-    }
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
 
-    .set-card.selected {
-      background-color: #d1c4e9;
-      transform: scale(1.1);
-    }
+        .flashcard .front, .flashcard .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #333;
+        }
 
-    .flashcard-container {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      backdrop-filter: blur(5px);
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 10;
-    }
+        .flashcard .back {
+            transform: rotateY(180deg);
+            background-color: #f3f3f3;
+        }
 
-    .flashcard {
-      width: 300px;
-      height: 200px;
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 18px;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.6s;
-    }
+        .flashcard-info {
+            font-size: 14px;
+            margin-top: 10px;
+            color: #777;
+        }
 
-    .flashcard .front, .flashcard .back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 10px;
-    }
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background-color: rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
 
-    .flashcard .back {
-      transform: rotateY(180deg);
-    }
+        .progress-bar {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+        }
 
-    .flashcard.flipped {
-      transform: rotateY(180deg);
-    }
+        .button {
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
-    .flashcard-info {
-      font-size: 12px;
-      color: gray;
-      margin-top: 10px;
-    }
+        .button:hover {
+            background-color: #5a54e3;
+        }
 
-    .buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
+        .button.pause-resume {
+            background-color: #ff9800;
+        }
 
-    .options-header {
-      text-align: center;
-      font-weight: bold;
-      margin-top: 40px;
-    }
+        .button.pause-resume:hover {
+            background-color: #e68900;
+        }
 
-    .options {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 10px;
-    }
+        .button.close {
+            background-color: #ff5722;
+        }
 
-    .toggle-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 10px 0;
-    }
+        .button.close:hover {
+            background-color: #e64a19;
+        }
 
-    .slider {
-      position: relative;
-      width: 50px;
-      height: 24px;
-      background-color: #ccc;
-      border-radius: 15px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
+        .hidden {
+            display: none;
+        }
 
-    .slider:before {
-      content: '';
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 20px;
-      height: 20px;
-      background-color: white;
-      border-radius: 50%;
-      transition: transform 0.3s;
-    }
+        .options-section {
+            margin-top: 20px;
+            text-align: center;
+        }
 
-    .slider.active {
-      background-color: #6a1b9a;
-    }
+        .option-toggle {
+            margin: 10px;
+        }
 
-    .slider.active:before {
-      transform: translateX(26px);
-    }
+        .option-label {
+            font-size: 14px;
+            margin-right: 10px;
+        }
 
-    button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      background-color: #6a1b9a;
-      color: white;
-      cursor: pointer;
-      font-size: 14px;
-    }
+        .toggle {
+            display: inline-block;
+            position: relative;
+            width: 50px;
+            height: 25px;
+            background-color: #ccc;
+            border-radius: 25px;
+            cursor: pointer;
+        }
 
-    button:hover {
-      background-color: #4a148c;
-    }
+        .toggle .inner-circle {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
 
-    .close-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: #e57373;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 5px 10px;
-      cursor: pointer;
-    }
+        .toggle.active {
+            background-color: #6c63ff;
+        }
 
-    .progress-bar {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      height: 4px;
-      background-color: #6a1b9a;
-      width: 0%;
-      transition: width 1s linear;
-    }
+        .toggle.active .inner-circle {
+            transform: translateX(25px);
+        }
 
-    .pause-resume-btn {
-      margin-top: 20px;
-      background-color: #ff7043;
-    }
-  </style>
+    </style>
 </head>
 <body>
-  <div class="header">Greek Vocab</div>
 
-  <div class="card-container">
-    <div class="set-card" data-set="1">Set 1</div>
-    <div class="set-card" data-set="2">Set 2</div>
-    <div class="set-card" data-set="3">Set 3</div>
-    <div class="set-card" data-set="4">Set 4</div>
-    <div class="set-card" data-set="5">Set 5</div>
-  </div>
+<!-- Flashcards Container -->
+<div class="flashcard-container">
+    <div class="flashcard" id="flashcard">
+        <div class="front">Word</div>
+        <div class="back">Definition</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+    <div class="flashcard-info" id="flashcardInfo">Set: Vocabulary Set</div>
+    <div class="flashcard-buttons">
+        <button class="button" id="prevCard">Previous</button>
+        <button class="button" id="flipCard">Flip</button>
+        <button class="button" id="nextCard">Next</button>
+        <button class="button pause-resume" id="pauseResumeBtn">Pause</button>
+        <button class="button close" id="closeFlashcards">Close</button>
+    </div>
+</div>
 
-  <div style="text-align: center; margin-top: 10px;">
-    <button id="startReview">Start Review</button>
-  </div>
+<!-- Options Section -->
+<div class="options-section">
+    <h3>Options</h3>
+    <label for="randomizeToggle" class="option-label">Randomize</label>
+    <div class="toggle" id="randomizeToggle"></div>
+    <br>
+    <label for="automaticToggle" class="option-label">Automatic</label>
+    <div class="toggle" id="automaticToggle"></div>
+    <br>
+    <input type="number" id="intervalInput" value="3" class="option-toggle" min="1"> seconds per card
+</div>
 
-  <div class="flashcard-container">
-    <button class="close-btn" id="closeFlashcards">X</button>
-    <div id="flashcard" class="flashcard">
-      <div class="front"></div>
-      <div class="back"></div>
-    </div>
-    <div class="flashcard-info"></div>
-    <div class="progress-bar" id="progressBar"></div>
-    <div class="buttons">
-      <button id="prevCard">Previous</button>
-      <button id="flipCard">Flip</button>
-      <button id="nextCard">Next</button>
-      <button id="pauseResumeBtn" class="pause-resume-btn">Pause</button>
-    </div>
-  </div>
+<!-- Buttons to select sets -->
+<div class="sets-container">
+    <div class="set-card" data-set="0">Set 1</div>
+    <div class="set-card" data-set="1">Set 2</div>
+    <div class="set-card" data-set="2">Set 3</div>
+    <div class="set-card" data-set="3">Set 4</div>
+    <div class="set-card" data-set="4">Set 5</div>
+</div>
 
-  <div class="options-header">Options</div>
-  <div class="options">
-    <div class="toggle-container">
-      <label for="randomizeToggle">Randomize</label>
-      <div id="randomizeToggle" class="slider"></div>
-    </div>
-    <div class="toggle-container">
-      <label for="automaticToggle">Automatic</label>
-      <div id="automaticToggle" class="slider"></div>
-    </div>
-    <div class="toggle-container">
-      <label for="intervalInput">Interval (seconds)</label>
-      <input id="intervalInput" type="number" min="1" max="10" value="3" style="width: 60px;">
-    </div>
-  </div>
+<!-- Start Review Button -->
+<button class="button" id="startReview">Start Review</button>
 
-  <script>
+<script>
     const sets = {
-      1: [{ word: "Word 1", definition: "Definition 1" }, { word: "Word 2", definition: "Definition 2" }, { word: "Word 3", definition: "Definition 3" }],
-      2: [{ word: "Word 4", definition: "Definition 4" }, { word: "Word 5", definition: "Definition 5" }, { word: "Word 6", definition: "Definition 6" }],
-      3: [{ word: "Word 7", definition: "Definition 7" }, { word: "Word 8", definition: "Definition 8" }, { word: "Word 9", definition: "Definition 9" }],
-      4: [{ word: "Word 10", definition: "Definition 10" }, { word: "Word 11", definition: "Definition 11" }, { word: "Word 12", definition: "Definition 12" }],
-      5: [{ word: "Word 13", definition: "Definition 13" }, { word: "Word 14", definition: "Definition 14" }, { word: "Word 15", definition: "Definition 15" }]
+        0: [{ word: 'αγάπη', definition: 'love' }, { word: 'λύκος', definition: 'wolf' }, { word: 'πόλη', definition: 'city' }],
+        1: [{ word: 'θάλασσα', definition: 'sea' }, { word: 'οδός', definition: 'road' }, { word: 'καλός', definition: 'good' }],
+        2: [{ word: 'ήλιος', definition: 'sun' }, { word: 'άστρο', definition: 'star' }, { word: 'βουνό', definition: 'mountain' }],
+        3: [{ word: 'πόλεμος', definition: 'war' }, { word: 'ειρήνη', definition: 'peace' }, { word: 'πόλεως', definition: 'city (genitive)' }],
+        4: [{ word: 'βίβλος', definition: 'book' }, { word: 'λόγος', definition: 'word' }, { word: 'άγγελος', definition: 'angel' }]
     };
-let selectedSets = [];
+
+    let selectedSets = [];
     let currentCards = [];
     let currentIndex = 0;
     let intervalTime = 3000; // 3 seconds for each side
     let autoInterval;
     let automatic = false;
-
-    // Toggles and setting up the sets
+    let isPaused = false;
+    let progress = 0;
+    
+    // Set up selection for sets
     document.querySelectorAll('.set-card').forEach(card => {
-      card.addEventListener('click', () => {
-        card.classList.toggle('selected');
-        const setIndex = card.getAttribute('data-set');
-        if (card.classList.contains('selected')) {
-          selectedSets.push(setIndex);
-        } else {
-          selectedSets = selectedSets.filter(set => set !== setIndex);
-        }
-      });
+        card.addEventListener('click', () => {
+            card.classList.toggle('selected');
+            const setIndex = card.getAttribute('data-set');
+            if (card.classList.contains('selected')) {
+                selectedSets.push(setIndex);
+            } else {
+                selectedSets = selectedSets.filter(set => set !== setIndex);
+            }
+        });
     });
 
     document.getElementById('startReview').addEventListener('click', () => {
-      if (selectedSets.length > 0) {
-        currentCards = [];
-        selectedSets.forEach(setIndex => {
-          currentCards = currentCards.concat(sets[setIndex]);
-        });
-        if (document.getElementById('randomizeToggle').classList.contains('active')) {
-          currentCards.sort(() => Math.random() - 0.5);
+        if (selectedSets.length > 0) {
+            currentCards = [];
+            selectedSets.forEach(setIndex => {
+                currentCards = currentCards.concat(sets[setIndex]);
+            });
+            if (document.getElementById('randomizeToggle').classList.contains('active')) {
+                currentCards.sort(() => Math.random() - 0.5);
+            }
+            currentIndex = 0;
+            showFlashcard();
+            document.querySelector('.flashcard-container').style.display = 'flex';
         }
-        currentIndex = 0;
-        showFlashcard();
-        document.querySelector('.flashcard-container').style.display = 'flex';
-        startAutomatic();
-      }
     });
-
-    document.getElementById('closeFlashcards').addEventListener('click', () => {
-      document.querySelector('.flashcard-container').style.display = 'none';
-      clearInterval(autoInterval);
-    });
-
-    document.getElementById('nextCard').addEventListener('click', () => {
-      currentIndex = (currentIndex + 1) % currentCards.length;
-      showFlashcard();
-    });
-
-    document.getElementById('prevCard').addEventListener('click', () => {
-      currentIndex = (currentIndex - 1 + currentCards.length) % currentCards.length;
-      showFlashcard();
-    });
-
-    document.getElementById('flipCard').addEventListener('click', () => {
-      const flashcard = document.getElementById('flashcard');
-      flashcard.classList.toggle('flipped');
-    });
-
-    document.getElementById('pauseResumeBtn').addEventListener('click', () => {
-      if (automatic) {
-        clearInterval(autoInterval);
-        document.getElementById('pauseResumeBtn').textContent = "Resume";
-      } else {
-        startAutomatic();
-        document.getElementById('pauseResumeBtn').textContent = "Pause";
-      }
-      automatic = !automatic;
-    });
-
-    const randomizeToggle = document.getElementById('randomizeToggle');
-    randomizeToggle.addEventListener('click', () => {
-      randomizeToggle.classList.toggle('active');
-    });
-
-    const automaticToggle = document.getElementById('automaticToggle');
-    automaticToggle.addEventListener('click', () => {
-      automatic = !automatic;
-      automaticToggle.classList.toggle('active');
-      if (automatic) {
-        startAutomatic();
-      } else {
-        clearInterval(autoInterval);
-        document.getElementById('pauseResumeBtn').textContent = "Pause";
-      }
-    });
-
-    document.getElementById('intervalInput').addEventListener('change', (e) => {
-      intervalTime = e.target.value * 1000;
-      if (automatic) {
-        clearInterval(autoInterval);
-        startAutomatic();
-      }
-    });
-
-    function startAutomatic() {
-      const interval = intervalTime; // time for each side
-      autoInterval = setInterval(() => {
-        document.getElementById('flashcard').classList.add('flipped');
-        setTimeout(() => {
-          currentIndex = (currentIndex + 1) % currentCards.length;
-          showFlashcard();
-          document.getElementById('flashcard').classList.remove('flipped');
-        }, intervalTime); // Flip back after showing the definition
-      }, intervalTime); // Show front side first
-    }
 
     function showFlashcard() {
-      const flashcard = document.getElementById('flashcard');
-      const info = document.querySelector('.flashcard-info');
-      const cardData = currentCards[currentIndex];
-      flashcard.classList.remove('flipped');
-      flashcard.querySelector('.front').textContent = cardData.word;
-      flashcard.querySelector('.back').textContent = cardData.definition;
-      info.textContent = `Set: ${getSetOfWord(cardData.word)}`;
+        const card = currentCards[currentIndex];
+        document.querySelector('.flashcard .front').textContent = card.word;
+        document.querySelector('.flashcard .back').textContent = card.definition;
+        document.getElementById('flashcardInfo').textContent = `Set: Set ${selectedSets.join(', ')}`;
 
-      // Reset progress bar
-      const progressBar = document.getElementById('progressBar');
-      progressBar.style.width = '0%';
-      setTimeout(() => {
-        progressBar.style.width = '100%';
-      }, 100);
+        // Reset progress bar
+        document.getElementById('progressBar').style.width = '0%';
 
-    }
+        // Flip to "word" side initially
+        document.querySelector('.flashcard').classList.remove('flipped');
 
-    function getSetOfWord(word) {
-      for (const set in sets) {
-        if (sets[set].some(card => card.word === word)) {
-          return set;
+        // Start automatic mode if enabled
+        if (automatic) {
+            startTimer();
         }
-      }
-      return "Unknown";
     }
-  </script>
+
+    // Timer functionality for automatic mode
+        function startTimer() {
+            let progressBar = document.getElementById('progressBar');
+            progress = 0;
+            
+            // If the timer is paused, don't start a new interval
+            if (isPaused) return;
+
+            clearInterval(autoInterval);
+            autoInterval = setInterval(() => {
+                progress += 100 / (intervalTime / 100);  // 100% in the set interval time
+                progressBar.style.width = `${progress}%`;
+
+                if (progress >= 100) {
+                    clearInterval(autoInterval);
+                    nextCard();
+                }
+            }, 100);
+        }
+
+    // Flip card functionality
+    document.getElementById('flipCard').addEventListener('click', () => {
+        document.querySelector('.flashcard').classList.toggle('flipped');
+    });
+
+    // Next card functionality
+    document.getElementById('nextCard').addEventListener('click', () => {
+        if (currentIndex < currentCards.length - 1) {
+            currentIndex++;
+            showFlashcard();
+            if (automatic && !isPaused) startTimer();
+        }
+    });
+
+    // Previous card functionality
+    document.getElementById('prevCard').addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            showFlashcard();
+            if (automatic && !isPaused) startTimer();
+        }
+    });
+
+    // Pause/Resume button functionality
+    document.getElementById('pauseResumeBtn').addEventListener('click', () => {
+        isPaused = !isPaused;
+        if (isPaused) {
+            clearInterval(autoInterval);
+            document.getElementById('pauseResumeBtn').textContent = 'Resume';
+        } else {
+            startTimer();
+            document.getElementById('pauseResumeBtn').textContent = 'Pause';
+        }
+    });
+
+    // Close button functionality
+    document.getElementById('closeFlashcards').addEventListener('click', () => {
+        document.querySelector('.flashcard-container').style.display = 'none';
+        clearInterval(autoInterval); // Stop the interval when closing
+    });
+
+    // Handle automatic toggle
+    document.getElementById('automaticToggle').addEventListener('click', () => {
+        const toggle = document.getElementById('automaticToggle');
+        toggle.classList.toggle('active');
+        automatic = toggle.classList.contains('active');
+
+        if (automatic) {
+            startTimer(); // Start the timer if automatic is on
+        } else {
+            clearInterval(autoInterval); // Stop the timer if automatic is off
+        }
+    });
+
+    // Handle randomize toggle
+    document.getElementById('randomizeToggle').addEventListener('click', () => {
+        document.getElementById('randomizeToggle').classList.toggle('active');
+    });
+
+    // Handle interval input change
+    document.getElementById('intervalInput').addEventListener('input', (e) => {
+        intervalTime = parseInt(e.target.value) * 1000; // Convert to milliseconds
+        if (automatic && !isPaused) {
+            startTimer(); // Restart the timer with the new interval if automatic is on
+        }
+    });
+</script>
 </body>
 </html>
