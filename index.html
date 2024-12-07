@@ -1,291 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Greek Vocab</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f4f4f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column;
-        }
-        .card-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
-        .flashcard {
-            width: 150px;
-            height: 200px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            position: relative;
-            perspective: 1000px;
-        }
-        .flashcard-inner {
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d;
-            transition: transform 0.5s;
-        }
-        .flashcard.flipped .flashcard-inner {
-            transform: rotateY(180deg);
-        }
-        .flashcard-front, .flashcard-back {
-            position: absolute;
-            backface-visibility: hidden;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .flashcard-back {
-            transform: rotateY(180deg);
-        }
-        .buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            width: 100%;
-        }
-        .button {
-            background-color: #6a0dad;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .button:disabled {
-            background-color: #ccc;
-        }
-        .progress-bar {
-            height: 5px;
-            background-color: #f4f4f9;
-            border-radius: 5px;
-            margin-top: 10px;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-        }
-        .progress-bar .progress {
-            height: 100%;
-            background-color: #6a0dad;
-            width: 0;
-            border-radius: 5px;
-        }
-        .options-section {
-            margin-top: 30px;
-            text-align: center;
-        }
-        .option-toggle {
-            margin-left: 10px;
-        }
-        .active {
-            background-color: #4caf50;
-        }
-    </style>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="styles/style.css"/>
+  <title>Greek Vocab</title>
 </head>
+
 <body>
-    <h1>Greek Vocab</h1>
-    <div class="card-container" id="flashcardContainer">
-        <!-- Flashcards will be dynamically inserted here -->
+  <div id="loading-container">
+    <div id ="loading">Loading</div>
+  </div>
+  
+  <h1 class="appTitle">Greek Vocab</h1>
+  
+  <div class="container">
+    <div class="containerHeader">Word Select</div>
+    <div id="group-container"></div>
+  </div>
+  
+  <div class="container">
+  <div class="containerHeader">Options</div>
+  
+  <div class="option">
+    <label for="shuffleOption" class="optionsLabel">Shuffle Words</label>
+    <input type="checkbox" id="shuffleOption">
+  </div>
+  
+  <div class="option">
+    <label for="group-by" class="optionsLabel">Group Words By</label>
+    <select id="group-by" onchange="regroupWords()">
+      <option value="dbChapter" selected>Chapter</option>
+      <option value="dbType">Part of Speech</option>
+      <option value="dbDifficulty">Difficulty</option>
+    </select>
+  </div>
+</div>
+  
+  <div class="container">
+    <div class="customBtn" id="startReviewBtn">Start Review</div>
+  </div>
+  
+  
+  <div id="tabletop" class="hidden">
+    <div class="container">
+      <div class="customBtn.noBackground" id="closeReviewBtn">&#x2715;</div>
+      <div class="containerHeader">Review</div>
+      
+      <div class="flashcardBox">
+        <div class="flashcard">
+          <div id="flashcardNumberFront"></div>
+          <div id="flashcardNumberBack"></div>
+          <div id="flashcardFront"></div>
+          <div id="flashcardBack"></div>
+          <div id="flashcardOtherFront">
+            <div id="flashcardChapterFront"></div>
+            <div id="flashcardFreqFront"></div>
+          </div>
+          <div id="flashcardOtherBack">
+            <div id="flashcardChapterBack"></div>
+            <div id="flashcardFreqBack"></div>
+          </div>
+        </div>     
+      </div>  
+      
+      <div class="customBtn" id="prevBtn">Prev</div>
+      <div class="customBtn" id="flipBtn">Flip</div>
+      <div class="customBtn" id="nextBtn">Next</div>
     </div>
+  </div>
 
-    <div class="buttons">
-        <button class="button" id="prevCardBtn" disabled>Previous</button>
-        <button class="button" id="flipCardBtn">Flip</button>
-        <button class="button" id="nextCardBtn" disabled>Next</button>
-    </div>
-
-    <div class="options-section">
-        <label for="automaticToggle" class="button option-toggle">
-            Automatic <input type="checkbox" id="automaticToggle" class="option-toggle">
-        </label>
-        <label for="intervalInput" class="button option-toggle">
-            Interval (seconds): <input type="number" id="intervalInput" value="3" class="option-toggle" min="1">
-        </label>
-        <label for="randomizeToggle" class="button option-toggle">
-            Randomize <input type="checkbox" id="randomizeToggle" class="option-toggle">
-        </label>
-    </div>
-
-    <script>
-        // Sample word sets for now
-        const wordSets = [
-            { name: "Set 1", words: [{ word: "Λόγος", definition: "Word" }, { word: "Σοφία", definition: "Wisdom" }] },
-            { name: "Set 2", words: [{ word: "Φιλία", definition: "Friendship" }, { word: "Πόλη", definition: "City" }] },
-            { name: "Set 3", words: [{ word: "Χρόνος", definition: "Time" }, { word: "Διαρκής", definition: "Continuous" }] },
-            { name: "Set 4", words: [{ word: "Έκρηξη", definition: "Explosion" }, { word: "Κατοικία", definition: "Dwelling" }] },
-            { name: "Set 5", words: [{ word: "Αλήθεια", definition: "Truth" }, { word: "Αγάπη", definition: "Love" }] }
-        ];
-
-        let selectedSets = [];
-        let currentCards = [];
-        let currentIndex = 0;
-        let isFlipped = false;
-        let isAutomatic = false;
-        let intervalTime = 3000; // Default 3 seconds
-        let progress = 0;
-        let autoInterval = null;
-
-        function updateButtons() {
-            document.getElementById('prevCardBtn').disabled = currentIndex === 0;
-            document.getElementById('nextCardBtn').disabled = currentIndex === currentCards.length - 1;
-        }
-
-        function renderFlashcards() {
-            const flashcardContainer = document.getElementById('flashcardContainer');
-            flashcardContainer.innerHTML = ''; // Clear any previous cards
-
-            currentCards.forEach((card, index) => {
-                const flashcardDiv = document.createElement('div');
-                flashcardDiv.classList.add('flashcard');
-                flashcardDiv.setAttribute('data-index', index);
-
-                const flashcardInner = document.createElement('div');
-                flashcardInner.classList.add('flashcard-inner');
-
-                const front = document.createElement('div');
-                front.classList.add('flashcard-front');
-                front.innerHTML = card.word;
-
-                const back = document.createElement('div');
-                back.classList.add('flashcard-back');
-                back.innerHTML = card.definition;
-
-                flashcardInner.appendChild(front);
-                flashcardInner.appendChild(back);
-                flashcardDiv.appendChild(flashcardInner);
-
-                flashcardDiv.addEventListener('click', function() {
-                    flashcardDiv.classList.toggle('flipped');
-                });
-
-                flashcardContainer.appendChild(flashcardDiv);
-            });
-        }
-
-        function startTimer() {
-            const flashcard = document.querySelector(`.flashcard[data-index='${currentIndex}']`);
-            const progressBar = flashcard.querySelector('.progress-bar .progress');
-            progress = 0;
-            clearInterval(autoInterval);
-
-            autoInterval = setInterval(() => {
-                progress += 100 / (intervalTime / 100); // Progress update
-                progressBar.style.width = `${progress}%`;
-
-                if (progress >= 100) {
-                    clearInterval(autoInterval);
-                    nextCard();
-                }
-            }, 100);
-        }
-
-        function showFlashcard() {
-            const flashcard = document.querySelector(`.flashcard[data-index='${currentIndex}']`);
-            const flashcardInner = flashcard.querySelector('.flashcard-inner');
-
-            if (isAutomatic) {
-                flashcardInner.querySelector('.flashcard-front').style.display = 'flex';
-                flashcardInner.querySelector('.flashcard-back').style.display = 'none';
-                setTimeout(() => {
-                    flashcardInner.querySelector('.flashcard-front').style.display = 'none';
-                    flashcardInner.querySelector('.flashcard-back').style.display = 'flex';
-                }, intervalTime / 2);
-                startTimer();
-            } else {
-                flashcardInner.querySelector('.flashcard-back').style.display = 'none';
-                flashcardInner.querySelector('.flashcard-front').style.display = 'flex';
-            }
-
-            updateButtons();
-        }
-
-        function nextCard() {
-            if (currentIndex < currentCards.length - 1) {
-                currentIndex++;
-                showFlashcard();
-            }
-        }
-
-        function prevCard() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                showFlashcard();
-            }
-        }
-
-        document.getElementById('nextCardBtn').addEventListener('click', nextCard);
-        document.getElementById('prevCardBtn').addEventListener('click', prevCard);
-        document.getElementById('flipCardBtn').addEventListener('click', function() {
-            document.querySelector(`.flashcard[data-index='${currentIndex}']`).classList.toggle('flipped');
-        });
-
-        document.getElementById('automaticToggle').addEventListener('change', function() {
-            isAutomatic = this.checked;
-            if (isAutomatic) startTimer();
-            else clearInterval(autoInterval);
-        });
-
-        document.getElementById('intervalInput').addEventListener('input', function() {
-            intervalTime = this.value * 1000;
-            if (isAutomatic) {
-                clearInterval(autoInterval);
-
-startTimer();
-            }
-        });
-
-        document.getElementById('randomizeToggle').addEventListener('change', function() {
-            if (this.checked) {
-                currentCards = shuffleCards(currentCards);
-                currentIndex = 0; // Reset to first card after shuffling
-                renderFlashcards();
-                showFlashcard();
-            } else {
-                renderFlashcards();
-                showFlashcard();
-            }
-        });
-
-        function shuffleCards(cards) {
-            let shuffled = [...cards];
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-            return shuffled;
-        }
-
-        function initialize() {
-            // Assuming all sets are initially selected
-            selectedSets = wordSets; 
-            currentCards = selectedSets.flatMap(set => set.words);
-            currentIndex = 0;
-            renderFlashcards();
-            showFlashcard();
-        }
-
-        // Initialize the app on load
-        window.onload = initialize;
-    </script>
+<script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js" defer></script>
+<script src="scripts/script_v2.js" defer></script>  
+  
 </body>
+
 </html>
