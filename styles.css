@@ -1,92 +1,310 @@
+:root {
+    --purple-1: #6B5B95; /* Muted Purple */
+    --purple-2: #9B7FB5;
+    --blue-1: #5D8AA8; /* Cool Muted Blue */
+    --blue-2: #BFD7EA; /* Soft Neutral Grey-Blue */
+    --text-color: #FFFFFF; /* For high contrast text */
+    --cream: #F2F6F6;
+}
+
+html {
+    font-size: clamp(14px, 1vw, 18px);
+}
+
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f3f3f3;
-    color: #333;
+    background-color: var(--cream);
+}
+
+.appTitle {
+    text-align: center;
+}
+
+
+.container {
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap */
+    gap: 10px; /* Optional: Space between items */
+    align-content: center;
+    justify-content: center;
+    background-color: var(--blue-2);
+    border-radius: 8px;
+    border: 1px solid black;     
+    padding: 5%;
+    margin: 5% 10%;
+    box-shadow: 8px 8px 20px black;
+    position: relative;
+}
+
+.containerHeader {
+   position: relative;
+    text-align: center;
+   width: 100%;
+   padding-bottom: 10%; 
+   font-size: 1.5rem;
+   font-weight: 700;
+}
+
+#group-container {
+   display: flex;
+   flex-wrap: wrap;
+   align-content: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.groupCard {
+    cursor: pointer;
+    border: 1px black solid;
+    border-radius: 8px;
+    background: linear-gradient(90deg, var(--purple-1), var(--purple-2));
+    padding: 12px 16px;
+    color: var(--cream);
+    text-align: center;
+    box-sizing: border-box;
+        
+    /* Flex properties to ensure wrapping and responsiveness */
+    flex: 0 1 auto;  /* Flex-grow, flex-shrink, and base size of 30% */
+    
+    transition: background 0.6s ease, transform 0.6s ease, box-shadow 0.6s ease;
+}
+
+.groupCard:hover
+, .customBtn:hover {
+     transform: scale(1.05);   
+}
+
+.groupCard:active
+, .customBtn:active {
+     transform: scale(0.95);
+}
+
+.groupCard.active {
+     background: linear-gradient(90deg, var(--purple-1), var(--blue-1));
+     transform: scale(1.05);
+     box-shadow: 2px 2px 4px black;
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+input[type="checkbox"] {
+    margin-left: 10px;
+}
+
+select {
+    flex: 1;
+    margin-left: 10px;
+    padding: 5px;
+    font-size: 1rem;
+}
+
+.customBtn {
+    cursor: pointer;
+    border: 1px solid black;
+    background: linear-gradient(90deg, var(--blue-1), #87AFCF);
+    color: var(--cream);
+    padding: 12px 16px;
+    border-radius: 8px;
+}
+
+.hidden {
+    visibility: hidden;
+    opacity: 0;
+}
+
+#tabletop,
+#loading-container {
+    background-color:  #00000088;
+    backdrop-filter: blur(10px);
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
     display: flex;
     flex-direction: column;
-    align-items: center;
 }
 
-header {
-    background-color: #6200ea;
-    color: white;
-    padding: 20px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+#loading {
+    font-size: 2rem;
+    color: var(--cream);
+    animation: flicker 1s infinite linear;
 }
 
-.card-container {
-    display: flex;
-    gap: 20px;
-    margin: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
+@keyframes flicker {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
 }
 
-.card {
-    width: 150px;
-    height: 100px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
-.flashcard-view {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    width: 300px;
-    z-index: 1000;
-}
-
-.flashcard {
-    margin-bottom: 20px;
-    font-size: 18px;
-    color: #6200ea;
-}
-
-button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #6200ea;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 5px;
-}
-
-button:hover {
-    background-color: #4500b5;
-}
-
-.close-btn {
+#closeReviewBtn {
     position: absolute;
     top: 10px;
     right: 10px;
-    font-size: 20px;
-    background: none;
-    color: #6200ea;
-    border: none;
-    cursor: pointer;
+}
+
+.noBackground {
+    background-color: none;
+}
+
+
+/* Flashcard design stuff */
+.flashcardBox {
+    width: 100%;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    margin-bottom: 5%;
+    perspective: 1000px;
+}
+
+.flashcard {
+    width: 60vw;
+    aspect-ratio: 9/16;
+    border: 1px solid black;
+    border-radius: 12px;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease;
+    box-shadow: 0px 4px 12px black;
+}
+
+#flashcardFront
+, #flashcardBack {
+    backface-visibility: hidden;
+    position: absolute;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    text-align: center;
+}
+
+#flashcardBack
+, #flashcardNumberBack
+, #flashcardOtherBack {
+    transform: rotateY(180deg);
+}
+
+.flipped {
+    transform: rotateY(180deg);
+}
+
+#flashcardNumberFront
+, #flashcardNumberBack {
+    backface-visibility: hidden;
+    font-size: 1rem;
+    padding: 10px 14px;
+    color: black;
+    border-bottom: 1px solid black;
+    border-radius: 8px;
+    position: absolute;
+    top: 10px;
+}
+
+#flashcardOtherFront
+, #flashcardOtherBack {
+    backface-visibility: hidden;
+    font-size: 1rem;
+    color: grey;
+    position: absolute;
+    bottom: 10px;
+}
+
+
+
+/* slide classes/animations */
+.slideOutLeft {
+    animation: slideOutLeft 0.15s forwards;
+}
+
+.slideInLeft {
+    animation: slideInLeft 0.15s forwards;
+}
+
+.slideOutRight {
+    animation: slideOutRight 0.15s forwards;
+}
+
+.slideInRight {
+    animation: slideInRight 0.15s forwards;
+}
+
+.jumpLtoR {
+    animation: jumpLtoR 0s forwards;
+}
+
+.jumpRtoL {
+    animation: jumpRtoL 0s forwards;
+}
+
+/* keyframes for slide animations */
+@keyframes slideOutLeft {
+    from {transform: translateX(0);
+    }
+    to {transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+@keyframes slideInLeft {
+    from {transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {transform: translateX(0);
+    }
+    to {transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes slideInRight {
+    from {transform: translateX(100%);
+        opacity: 0;
+    }
+    to {transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes jumpLtoR {
+    from {transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {transform: translateX(100%);
+        opacity:0;
+    }
+}
+
+@keyframes jumpRtoL {
+    from {transform: translateX(100%);
+        opacity: 0;
+    }
+    to {transform: translateX(-100%);
+        opacity:0;
+    }
 }
