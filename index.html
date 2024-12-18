@@ -4,6 +4,7 @@
 <head>
   <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
   <link rel="stylesheet" href="styles/style.css"/>
+  <script src="https://kit.fontawesome.com/0f335c8f67.js" crossorigin="anonymous"></script>
   <title>Greek Vocab</title>
 </head>
 
@@ -25,6 +26,16 @@
   <div class="option">
     <label for="shuffleOption" class="optionsLabel">Shuffle Words</label>
     <input type="checkbox" id="shuffleOption">
+  </div>
+    
+  <div class="option">
+    <label for="timerOption" class="optionsLabel">Autoplay</label>
+    <input type="checkbox" id="timerOption">
+  </div>
+    
+  <div class="option hidden">
+    <label for="intervalOption" class="optionsLabel">Autoplay Interval</label>
+    <input type="number" value="5" min="0" id="intervalOption" style="width: 50%;"> seconds
   </div>
   
   <div class="option">
@@ -49,24 +60,43 @@
       
       <div class="flashcardBox">
         <div class="flashcard">
+          <div id="timerBar"></div>
           <div id="flashcardNumberFront"></div>
           <div id="flashcardNumberBack"></div>
-          <div id="flashcardFront"></div>
+          <div id="flashcardCenterFront">
+            <div id="flashcardFront"></div>
+             <div id="flashcardAudioFront">
+               <i class="fa-regular fa-circle-play"></i>
+            </div>
+               <audio id="audioPlayerFront"></audio>
+          </div>
           <div id="flashcardBack"></div>
           <div id="flashcardOtherFront">
             <div id="flashcardChapterFront"></div>
+            <div style="display: flex; gap: 5px;">
+               <div id="flashcardDifficultyFront"></div><i class="fa-regular fa-pen-to-square"></i>
+            </div>
             <div id="flashcardFreqFront"></div>
           </div>
           <div id="flashcardOtherBack">
             <div id="flashcardChapterBack"></div>
+            <div style="display: flex; gap: 5px;">
+              <div id="flashcardDifficultyBack"></div><i class="fa-regular fa-pen-to-square"></i>
+            </div>
             <div id="flashcardFreqBack"></div>
           </div>
         </div>     
       </div>  
       
-      <div class="customBtn" id="prevBtn">Prev</div>
+      <div class="customBtn" id="prevBtn">
+        <i class="fa-solid fa-arrow-left"></i>
+      </div>
       <div class="customBtn" id="flipBtn">Flip</div>
-      <div class="customBtn" id="nextBtn">Next</div>
+      <div class="customBtn" id="nextBtn">
+        <i class="fa-solid fa-arrow-right"></i>
+      </div>
+      <div class="customBtn" id="autoplayBtn">Stop autoplay</div>
+      
     </div>
   </div>
 
