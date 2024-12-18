@@ -15,13 +15,30 @@ firebase.initializeApp(firebaseConfig);
 
 // Use Firebase Functionality
 const db = firebase.firestore();
+let localCache = {}; // Local cache for the session
+
+db.collection("mounce").orderBy("dbSequence").get()
+  .then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      localCache[doc.id] = doc.data(); // Store each document in localCache
+    });
+    
+  })
+  .catch((error) => {
+    console.error('Error loading initial data:', error);
+  });
 
 let selectedGroups = []; // to store groups that will be reviewed
 let selectedWords = []; // words for review
 let selectedDefinitions = []; // definitions for review
 let selectedChapters = []; // chapters for review
 let selectedFrequencies = []; // frequencies for review
+let selectedAudio = [];
+let selectedDifficulties = [];
 let currentIndex = 0; // to track word/definition pairs from these arrays
+let autoplay = false;
+let autoplayIntervalId = null; // To track the interval for autoplay
+let timerBarActive = false;    // Track if timerBar is active for immediate pause
 
 // Event delegation for dynamically created groupCards
 document.getElementById("group-container").addEventListener("click", function (event) {
@@ -37,6 +54,8 @@ document.getElementById("group-container").addEventListener("click", function (e
         const groupDefinitions = JSON.parse(clickedCard.getAttribute("data-definitions"));
         const groupChapters = JSON.parse(clickedCard.getAttribute("data-chapters"));
         const groupFrequencies = JSON.parse(clickedCard.getAttribute("data-frequencies"));
+        const groupAudio = JSON.parse(clickedCard.getAttribute("data-audio"));
+        const groupDifficulties = JSON.parse(clickedCard.getAttribute("data-difficulties"));
 
         // Add or remove group data based on its active status
         if (clickedCard.classList.contains("active") && groupIndex === -1) {
@@ -45,12 +64,16 @@ document.getElementById("group-container").addEventListener("click", function (e
             selectedDefinitions = selectedDefinitions.concat(groupDefinitions);
             selectedChapters = selectedChapters.concat(groupChapters);
             selectedFrequencies = selectedFrequencies.concat(groupFrequencies);
+            selectedAudio = selectedAudio.concat(groupAudio);
+            selectedDifficulties = selectedDifficulties.concat(groupDifficulties);
         } else if (!clickedCard.classList.contains("active") && groupIndex !== -1) {
-            selectedGroup.splice(groupIndex, 1);
+            selectedGroups.splice(groupIndex, 1);
             selectedWords = selectedWords.filter(word => !groupWords.includes(word));
             selectedDefinitions = selectedDefinitions.filter(def => !groupDefinitions.includes(def));
             selectedChapters = selectedChapters.filter(chap => !groupChapters.includes(chap));
             selectedFrequencies = selectedFrequencies.filter(freq => !groupFrequencies.includes(freq));
+            selectedAudio = selectedAudio.filter(audio => !groupAudio.includes(audio));
+            selectedDifficulties = selectedDifficulties.filter(diff => !groupDifficulties.includes(diff));
         }
     }
 });
@@ -64,16 +87,18 @@ async function regroupWords() {
         const querySnapshot = await db.collection("mounce").orderBy("dbSequence").get();
         const groupedWords = {};
 
-        // Group words by the selected column
-        querySnapshot.forEach((doc) => {
-            const word = { id: doc.id, ...doc.data() };
-            const groupKey = word[groupBy];
+// Iterate over the localCache to group words
+for (const docId in localCache) {
+  const word = { id: docId, ...localCache[docId] };
+  const groupKey = word[groupBy];
 
-            if (!groupedWords[groupKey]) {
-                groupedWords[groupKey] = []; // Create a new group if it doesn't exist
-            }
-            groupedWords[groupKey].push(word);
-        });
+  if (!groupedWords[groupKey]) {
+    groupedWords[groupKey] = []; // Create a new group if it doesn't exist
+  }
+  groupedWords[groupKey].push(word);
+}
+        
+        
 
         // Update the DOM
         const container = document.getElementById("group-container");
@@ -87,14 +112,17 @@ async function regroupWords() {
             const definitions = groupedWords[key].map((word) => word.dbMeaning);
             const chapters = groupedWords[key].map((word) => word.dbChapter);
             const frequencies = groupedWords[key].map((word) => word.dbFrequency);
+            const audio = groupedWords[key].map((word) => word.dbSayWordFile);
+            const difficulties = groupedWords[key].map((word) => word.dbDifficulty);
 
             groupDiv.setAttribute("data-words", JSON.stringify(words));
             groupDiv.setAttribute("data-definitions", JSON.stringify(definitions));
             groupDiv.setAttribute("data-chapters", JSON.stringify(chapters));
             groupDiv.setAttribute("data-frequencies", JSON.stringify(frequencies));
+            groupDiv.setAttribute("data-audio", JSON.stringify(audio));
+            groupDiv.setAttribute("data-difficulties", JSON.stringify(difficulties));
             
-            
-            groupDiv.innerHTML = `${groupBy.charAt(0).toUpperCase() + groupBy.slice(1)}: ${key}`;
+            groupDiv.innerHTML = `${groupBy.charAt(2).toUpperCase() + groupBy.slice(3)}: ${key}`;
 
             container.appendChild(groupDiv);
         });
@@ -104,6 +132,8 @@ async function regroupWords() {
         selectedDefinitions = [];
         selectedChapters = [];
         selectedFrequencies = [];
+        selectedAudio = [];
+        selectedDifficulties = [];
         
         console.log(`Words regrouped by ${groupBy} and added as attributes.`);
     } catch (error) {
@@ -115,9 +145,11 @@ async function regroupWords() {
 
 regroupWords();
 
-// Start review button
-document.getElementById("startReviewBtn").addEventListener("click", function () {
-    // If some words are selected, start at the first word and bring up the flashcard
+// Updated startReview to handle autoplay correctly
+function startReview() {
+    const intervalOption = document.getElementById("intervalOption").value || 0;
+    document.getElementById("autoplayBtn").textContent = autoplay ? "Stop autoplay" : "Start autoplay";
+
     if (selectedWords.length > 0) {
         if (document.getElementById("shuffleOption").checked) {
             shuffleWordDef();
@@ -125,11 +157,37 @@ document.getElementById("startReviewBtn").addEventListener("click", function () 
         currentIndex = 0;
         document.getElementById("tabletop").classList.remove("hidden");
         showWordDef();
+
+        // Start autoplay if enabled
+        if (autoplay && intervalOption !== "0") {
+            startAutoplay(Number(intervalOption) * 1000);
+        }
+    }
+}
+
+// allow user to set timer
+document.getElementById("timerOption").addEventListener("change" , function () {
+    const intervalOption = document.getElementById("intervalOption").parentElement;
+    intervalOption.classList.toggle("hidden");
+    if (!this.checked) {
+        pauseAutoplay();
     }
 });
 
+// Start review button
+document.getElementById("startReviewBtn").addEventListener("click", function () {
+    autoplay = document.getElementById("timerOption").checked;
+    
+    document.getElementById("autoplayBtn").textContent = autoplay ? "Stop autoplay" : "Start autoplay";
+    
+    startReview();
+});
+
 // Close review button
+// Stop everything when review is closed
 document.getElementById("closeReviewBtn").addEventListener("click", function () {
+    pauseAutoplay(); // Ensure autoplay is stopped
+    autoplay = false;
     document.getElementById("tabletop").classList.add("hidden");
 });
 
@@ -148,6 +206,12 @@ document.getElementById("nextBtn").addEventListener("click", function () {
     navigateFlashcards("next");
 });
 
+
+// Play Greek audio
+document.getElementById("flashcardAudioFront").addEventListener("click", function () {
+    document.getElementById("audioPlayerFront").play();
+});
+
 // Helper function to show the current word and definition
 function showWordDef() {
     if (selectedWords.length > 0 && currentIndex >= 0 && currentIndex < selectedWords.length) {
@@ -159,7 +223,13 @@ function showWordDef() {
         const flashcardChapterBack = document.getElementById("flashcardChapterBack");
         const flashcardFreqFront = document.getElementById("flashcardFreqFront");
         const flashcardFreqBack = document.getElementById("flashcardFreqBack");
-
+        const audioPlayerFront = document.getElementById("audioPlayerFront");
+           audioPlayerFront.src = `https://github.com/kalebirey/kalebirey.github.io/raw/refs/heads/main/GreekAudio/${selectedAudio[currentIndex]}.mp3`;
+           audioPlayerFront.load();
+           
+        const flashcardDifficultyFront = document.getElementById("flashcardDifficultyFront");
+        const flashcardDifficultyBack = document.getElementById("flashcardDifficultyBack");
+        
         if (document.querySelector(".flashcard").classList.contains("flipped")) {
             document.querySelector(".flashcard").classList.remove("flipped");
         }
@@ -172,6 +242,12 @@ function showWordDef() {
         flashcardChapterBack.textContent = `Chapter: ${selectedChapters[currentIndex]}`;
         flashcardFreqFront.textContent = `Frequency: ${selectedFrequencies[currentIndex]}`;
         flashcardFreqBack.textContent = `Frequency: ${selectedFrequencies[currentIndex]}`;
+        flashcardDifficultyFront.textContent = `Difficulty: ${selectedDifficulties[currentIndex]}`;
+        /*   const icon = document.createElement('i');
+           icon.classList.add('fa-regular', 'fa-pen-to-square'); // Add Font Awesome classes
+           flashcardDifficultyFront.appendChild(icon);*/
+        flashcardDifficultyBack.textContent = `Difficulty: ${selectedDifficulties[currentIndex]}`;
+        //   flashcardDifficultyBack.appendChild(icon);
     }
 }
 
@@ -205,7 +281,8 @@ function shuffleWordDef() {
         word: word,
         definition: selectedDefinitions[index],
         chapter: selectedChapters[index],
-        frequency: selectedFrequencies[index]
+        frequency: selectedFrequencies[index],
+        audio: selectedAudio[index]
     }));
 
     for (let i = pairedArray.length - 1; i > 0; i--) {
@@ -217,4 +294,132 @@ function shuffleWordDef() {
     selectedDefinitions = pairedArray.map(pair => pair.definition);
     selectedChapters = pairedArray.map(pair => pair.chapter);
     selectedFrequencies = pairedArray.map(pair => pair.frequency);
+    selectedAudio = pairedArray.map(pair => pair.audio);
+}
+
+// pause function
+function delay(ms) {
+    return new Promise(resolve =>
+    setTimeout(resolve, ms))
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// all the autoplay/timer stuff
+// Updated Timer Bar Functionality
+function startTimerBar(interval) {
+    const timerBar = document.getElementById("timerBar");
+
+    timerBar.style.transition = "none"; // Reset transition
+    timerBar.style.width = "0%";
+
+    // Trigger reflow for proper reset
+    void timerBar.offsetWidth;
+
+    timerBar.style.transition = `width ${interval}ms linear`; // Set transition duration
+    timerBar.style.width = "100%";
+
+    timerBarActive = true; // Mark the timer bar as active
+}
+
+function stopTimerBar() {
+    const timerBar = document.getElementById("timerBar");
+    timerBar.style.transition = "none";
+    timerBar.style.width = "0%"; // Reset width immediately
+    timerBarActive = false; // Mark the timer bar as inactive
+}
+
+// Updated Autoplay Functionality
+function startAutoplay(interval) {
+    // Clear any previous intervals to avoid overlaps
+    if (autoplayIntervalId) {
+        clearInterval(autoplayIntervalId);
+    }
+
+    autoplay = true;
+    // startTimerBar(interval); // Start the timer bar immediately
+    startTimerBar(interval);
+    autoplayRepeater(interval);
+    
+    // Execute the first cycle immediately
+    autoplayIntervalId = setInterval(() => {
+        if (autoplay) {
+            autoplayRepeater(interval);
+        }
+    }, interval * 2);
+}
+
+function autoplayRepeater(interval) {
+    // Flip the flashcard after the interval
+    setTimeout(() => {
+        document.querySelector(".flashcard").classList.add("flipped");
+        startTimerBar(interval); // Restart the timer bar for the next cycle
+    }, interval);
+
+    // Navigate to the next flashcard after the full interval happens twice
+    setTimeout(() => {
+        navigateFlashcards("next");
+        startTimerBar(interval); // Restart the timer bar for the next cycle
+    }, interval * 2);
+}
+
+function pauseAutoplay() {
+    if (autoplayIntervalId) {
+        clearInterval(autoplayIntervalId);
+        autoplayIntervalId = null;
+    }
+    autoplay = false;
+    stopTimerBar(); // Stop and reset the timer bar immediately
+}
+
+function toggleAutoplay(interval) {
+    if (autoplay) {
+        pauseAutoplay();
+        document.getElementById("autoplayBtn").textContent = "Start autoplay";
+    } else {
+        startAutoplay(interval);
+        document.getElementById("autoplayBtn").textContent = "Stop autoplay";
+    }
+}
+
+// Autoplay Button Event Listener
+document.getElementById("autoplayBtn").addEventListener("click", function () {
+    const intervalOption = document.getElementById("intervalOption").value || 0;
+    toggleAutoplay(Number(intervalOption) * 1000);
+});
+
+
+
+
+
+
+
+
+// update logic
+function updateData(docId, newData) {
+  // Update the local cache
+  if (localCache[docId]) {
+    Object.assign(localCache[docId], newData);  // Merge newData into the localCache
+  } else {
+    localCache[docId] = newData;  // Add new data if document is new
+  }
+
+  // Immediately update Firebase
+  firebase.firestore().collection('your-collection').doc(docId).set(newData, { merge: true })
+    .then(() => {
+      console.log(`Document ${docId} updated in Firebase`);
+    })
+    .catch((error) => {
+      console.error(`Error updating document ${docId} in Firebase:`, error);
+    });
 }
