@@ -114,6 +114,7 @@ select {
 .hidden {
     visibility: hidden;
     opacity: 0;
+    display: none;
 }
 
 #tabletop,
@@ -187,8 +188,8 @@ select {
     box-shadow: 0px 4px 12px black;
 }
 
-#flashcardFront
-, #flashcardBack {
+#flashcardCenterFront
+, #flashcardCenterBack {
     backface-visibility: hidden;
     position: absolute;
     align-content: center;
@@ -196,9 +197,23 @@ select {
     justify-content: center;
     justify-items: center;
     text-align: center;
+    display: flex;
+    flex-direction: column;h
 }
 
-#flashcardBack
+#flashcardFront
+, #flashcardBack {
+    backface-visibility: hidden;
+    position: relative;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    text-align: center;
+}
+
+#flashcardCenterBack
+, #flashcardBack
 , #flashcardNumberBack
 , #flashcardOtherBack {
     transform: rotateY(180deg);
@@ -229,7 +244,9 @@ select {
     bottom: 10px;
 }
 
-
+#flashcardAudioFront {
+    margin-top: 10px;
+}
 
 /* slide classes/animations */
 .slideOutLeft {
@@ -307,4 +324,13 @@ select {
     to {transform: translateX(-100%);
         opacity:0;
     }
+}
+
+#timerBar {
+    width: 0px;
+    height: 5px;
+    background-color: var(--purple-1);
+    position: absolute;
+    bottom: 0px;
+    border-radius: 8px;
 }
