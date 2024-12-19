@@ -8,7 +8,8 @@
 }
 
 html {
-    font-size: clamp(14px, 1vw, 18px);
+  /*  font-size: clamp(14px, 1vw, 18px);*/
+    font-size: calc(1vh + 0.5em);
 }
 
 body {
@@ -23,11 +24,11 @@ body {
 .container {
     display: flex;
     flex-wrap: wrap; /* Allow items to wrap */
-    gap: 10px; /* Optional: Space between items */
+    gap: 5%; /* Optional: Space between items */
     align-content: center;
     justify-content: center;
     background-color: var(--blue-2);
-    border-radius: 8px;
+    border-radius: 0.5rem;
     border: 1px solid black;     
     padding: 5%;
     margin: 5% 10%;
@@ -49,15 +50,15 @@ body {
    flex-wrap: wrap;
    align-content: center;
     justify-content: center;
-    gap: 10px;
+    gap: 5%;
 }
 
 .groupCard {
     cursor: pointer;
     border: 1px black solid;
-    border-radius: 8px;
+    border-radius: 0.5rem;
     background: linear-gradient(90deg, var(--purple-1), var(--purple-2));
-    padding: 12px 16px;
+    padding: 1rem 1.25rem;
     color: var(--cream);
     text-align: center;
     box-sizing: border-box;
@@ -88,17 +89,17 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 5%;
 }
 
 input[type="checkbox"] {
-    margin-left: 10px;
+    margin-left: 5%;
 }
 
 select {
     flex: 1;
-    margin-left: 10px;
-    padding: 5px;
+    margin-left: 5%;
+    padding: 5%;
     font-size: 1rem;
 }
 
@@ -107,8 +108,8 @@ select {
     border: 1px solid black;
     background: linear-gradient(90deg, var(--blue-1), #87AFCF);
     color: var(--cream);
-    padding: 12px 16px;
-    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
 }
 
 .hidden {
@@ -153,8 +154,8 @@ select {
 
 #closeReviewBtn {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 5%;
+    right: 5%;
 }
 
 .noBackground {
@@ -173,7 +174,7 @@ select {
 }
 
 .flashcard {
-    width: 60vw;
+    height: 60vh;
     aspect-ratio: 9/16;
     border: 1px solid black;
     border-radius: 12px;
@@ -198,7 +199,7 @@ select {
     justify-items: center;
     text-align: center;
     display: flex;
-    flex-direction: column;h
+    flex-direction: column;
 }
 
 #flashcardFront
@@ -227,12 +228,12 @@ select {
 , #flashcardNumberBack {
     backface-visibility: hidden;
     font-size: 1rem;
-    padding: 10px 14px;
+    padding: 1rem 1.5rem;
     color: black;
     border-bottom: 1px solid black;
-    border-radius: 8px;
+    border-radius: 0.5rem;
     position: absolute;
-    top: 10px;
+    top: 1rem;
 }
 
 #flashcardOtherFront
@@ -241,11 +242,11 @@ select {
     font-size: 1rem;
     color: grey;
     position: absolute;
-    bottom: 10px;
+    bottom: 1rem;
 }
 
 #flashcardAudioFront {
-    margin-top: 10px;
+    margin-top: 1rem;
 }
 
 /* slide classes/animations */
@@ -328,9 +329,9 @@ select {
 
 #timerBar {
     width: 0px;
-    height: 5px;
+    height: 0.5rem;
     background-color: var(--purple-1);
     position: absolute;
     bottom: 0px;
-    border-radius: 8px;
+    border-radius: 0.5rem;
 }
