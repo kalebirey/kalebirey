@@ -167,7 +167,9 @@ function startReview() {
 
 // allow user to set timer
 document.getElementById("timerOption").addEventListener("change" , function () {
+    const timerOption = document.getElementById("timerOption").parentElement;
     const intervalOption = document.getElementById("intervalOption").parentElement;
+    timerOption.classList.toggle("noBorder");
     intervalOption.classList.toggle("hidden");
     if (!this.checked) {
         pauseAutoplay();
@@ -362,12 +364,20 @@ function startAutoplay(interval) {
 function autoplayRepeater(interval) {
     // Flip the flashcard after the interval
     setTimeout(() => {
+        if (!autoplay) {
+            console.log("Autoplay stopped.");
+            return;
+        }
         document.querySelector(".flashcard").classList.add("flipped");
         startTimerBar(interval); // Restart the timer bar for the next cycle
     }, interval);
 
     // Navigate to the next flashcard after the full interval happens twice
     setTimeout(() => {
+        if (!autoplay) {
+            console.log("TimerBar stopped.");
+            return;
+        }
         navigateFlashcards("next");
         startTimerBar(interval); // Restart the timer bar for the next cycle
     }, interval * 2);
