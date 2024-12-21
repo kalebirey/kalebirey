@@ -3,6 +3,7 @@
 <html>
 <head>
   <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css"/>
   <script src="https://kit.fontawesome.com/0f335c8f67.js" crossorigin="anonymous"></script>
   <title>Greek Vocab</title>
@@ -21,32 +22,33 @@
   </div>
   
   <div class="container">
-  <div class="containerHeader">Options</div>
-  
-  <div class="option">
-    <label for="shuffleOption" class="optionsLabel">Shuffle Words</label>
-    <input type="checkbox" id="shuffleOption">
-  </div>
+    <div class="containerHeader">Options</div>
+    <div id="option-container">
+      <div class="option">
+        <label for="shuffleOption" class="optionsLabel">Shuffle Words:</label>
+        <input type="checkbox" id="shuffleOption">
+      </div>
     
-  <div class="option">
-    <label for="timerOption" class="optionsLabel">Autoplay</label>
-    <input type="checkbox" id="timerOption">
-  </div>
+      <div class="option">
+        <label for="timerOption" class="optionsLabel">Autoplay:</label>
+        <input type="checkbox" id="timerOption">
+      </div>
     
-  <div class="option hidden">
-    <label for="intervalOption" class="optionsLabel">Autoplay Interval</label>
-    <input type="number" value="5" min="0" id="intervalOption" style="width: 50%;"> seconds
-  </div>
+      <div class="option hidden">
+        <label for="intervalOption" class="optionsLabel">&nbsp;&nbsp;&nbsp;&nbsp;Seconds:</label>
+        <input type="number" value="5" min="0" id="intervalOption">
+      </div>
   
-  <div class="option">
-    <label for="group-by" class="optionsLabel">Group Words By</label>
-    <select id="group-by" onchange="regroupWords()">
-      <option value="dbChapter" selected>Chapter</option>
-      <option value="dbType">Part of Speech</option>
-      <option value="dbDifficulty">Difficulty</option>
-    </select>
+      <div class="option noBorder">
+        <label for="group-by" class="optionsLabel">Group Words By:</label>
+        <select id="group-by" onchange="regroupWords()">
+          <option value="dbChapter" selected>Chapter</option>
+          <option value="dbType">Part of Speech</option>
+          <option value="dbDifficulty">Difficulty</option>
+        </select>
+      </div>
+    </div>
   </div>
-</div>
   
   <div class="container">
     <div class="customBtn" id="startReviewBtn">Start Review</div>
