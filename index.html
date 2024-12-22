@@ -5,7 +5,7 @@
   <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="font-awesome-favicon.png">
-  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="styles/style.css"/>
   <script src="https://kit.fontawesome.com/0f335c8f67.js" crossorigin="anonymous"></script>
   <title>Greek Vocab</title>
 </head>
@@ -77,7 +77,14 @@
           <div id="flashcardOtherFront">
             <div id="flashcardChapterFront"></div>
             <div style="display: flex; gap: 5px;">
-               <div id="flashcardDifficultyFront"></div><i class="fa-regular fa-pen-to-square"></i>
+               <div id="flashcardDifficultyFront"></div>
+                 <select id="difficulty-select">
+                   <option value="1">1</option>
+                   <option value="2">2</option>
+                   <option value="3">3</option>
+                   <option value="4">4</option>
+                   <option value="5">5</option>
+                 </select>
             </div>
             <div id="flashcardFreqFront"></div>
           </div>
@@ -105,7 +112,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore-compat.js" defer></script>
-<script src="script.js" defer></script>  
+<script src="scripts/script_v2.js" defer></script>  
   
 </body>
 
