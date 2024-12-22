@@ -28,6 +28,8 @@ db.collection("mounce").orderBy("dbSequence").get()
     console.error('Error loading initial data:', error);
   });
 
+
+
 let selectedGroups = []; // to store groups that will be reviewed
 let selectedWords = []; // words for review
 let selectedDefinitions = []; // definitions for review
@@ -244,12 +246,10 @@ function showWordDef() {
         flashcardChapterBack.textContent = `Chapter: ${selectedChapters[currentIndex]}`;
         flashcardFreqFront.textContent = `Frequency: ${selectedFrequencies[currentIndex]}`;
         flashcardFreqBack.textContent = `Frequency: ${selectedFrequencies[currentIndex]}`;
-        flashcardDifficultyFront.textContent = `Difficulty: ${selectedDifficulties[currentIndex]}`;
-        /*   const icon = document.createElement('i');
-           icon.classList.add('fa-regular', 'fa-pen-to-square'); // Add Font Awesome classes
-           flashcardDifficultyFront.appendChild(icon);*/
+        flashcardDifficultyFront.textContent = `Difficulty: `;
+        document.getElementById("difficulty-select").value = selectedDifficulties[currentIndex];
         flashcardDifficultyBack.textContent = `Difficulty: ${selectedDifficulties[currentIndex]}`;
-        //   flashcardDifficultyBack.appendChild(icon);
+        
     }
 }
 
