@@ -17,12 +17,14 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 let localCache = {}; // Local cache for the session
 
-db.collection("mounce").orderBy("dbSequence").get()
+// retrieve data from Firebase - restricted to first 337 words to read from DB less
+db.collection("mounce").where("dbSequence", "<", 338).orderBy("dbSequence").get()
   .then((querySnapshot) => {
     querySnapshot.forEach((doc) => {
       localCache[doc.id] = doc.data(); // Store each document in localCache
     });
     
+    regroupWords();  
   })
   .catch((error) => {
     console.error('Error loading initial data:', error);
@@ -41,6 +43,7 @@ let currentIndex = 0; // to track word/definition pairs from these arrays
 let autoplay = false;
 let autoplayIntervalId = null; // To track the interval for autoplay
 let timerBarActive = false;    // Track if timerBar is active for immediate pause
+let currentDocId; // Used for updates
 
 // Event delegation for dynamically created groupCards
 document.getElementById("group-container").addEventListener("click", function (event) {
@@ -86,7 +89,7 @@ async function regroupWords() {
     try {
         document.getElementById("loading-container").style.display = "flex"; // Show loading screen
 
-        const querySnapshot = await db.collection("mounce").orderBy("dbSequence").get();
+       // const querySnapshot = await db.collection("mounce").orderBy("dbSequence").get();
         const groupedWords = {};
 
 // Iterate over the localCache to group words
@@ -145,7 +148,6 @@ for (const docId in localCache) {
     }
 }
 
-regroupWords();
 
 // Updated startReview to handle autoplay correctly
 function startReview() {
@@ -248,7 +250,12 @@ function showWordDef() {
         flashcardFreqBack.textContent = `Frequency: ${selectedFrequencies[currentIndex]}`;
         flashcardDifficultyFront.textContent = `Difficulty: `;
         document.getElementById("difficulty-select").value = selectedDifficulties[currentIndex];
-        flashcardDifficultyBack.textContent = `Difficulty: ${selectedDifficulties[currentIndex]}`;
+        flashcardDifficultyBack.textContent = `Difficulty: `;
+        document.getElementById("difficulty-select-back").value = selectedDifficulties[currentIndex];
+        
+        currentDocId = Object.keys(localCache).find(docId => localCache[docId]["dbWord"] === selectedWords[currentIndex]);
+        console.log(`For word ${selectedWords[currentIndex]}, DocId is ${currentDocId}`);
+        
         
     }
 }
@@ -415,21 +422,30 @@ document.getElementById("autoplayBtn").addEventListener("click", function () {
 
 
 
-// update logic
-function updateData(docId, newData) {
-  // Update the local cache
-  if (localCache[docId]) {
-    Object.assign(localCache[docId], newData);  // Merge newData into the localCache
-  } else {
-    localCache[docId] = newData;  // Add new data if document is new
+ 
+function updateData(dataPoint, newData) {
+  // parse newData for certain updates
+  newData = dataPoint === "dbDifficulty" ? parseInt(newData, 10) : newData;
+    
+    //update relevant arrays
+    if (dataPoint === "dbDifficulty") selectedDifficulties[currentIndex] = newData;
+    
+    // Update the local cache
+  if (!localCache[currentDocId]) {
+    localCache[currentDocId] = {}; // Initialize if it doesn't exist
   }
+  
+  localCache[currentDocId][dataPoint] = newData; // Update the specific key with the new value
 
   // Immediately update Firebase
-  firebase.firestore().collection('your-collection').doc(docId).set(newData, { merge: true })
+  db.collection("mounce").doc(currentDocId).set(
+    { [dataPoint]: newData }, // Use bracket notation to dynamically set the field
+    { merge: true } // Merge to avoid overwriting the entire document
+  )
     .then(() => {
-      console.log(`Document ${docId} updated in Firebase`);
+      console.log(`Document ${currentDocId} updated in Firebase`);
     })
     .catch((error) => {
-      console.error(`Error updating document ${docId} in Firebase:`, error);
+      console.error(`Error updating document ${currentDocId} in Firebase:`, error);
     });
 }
