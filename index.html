@@ -78,7 +78,7 @@
             <div id="flashcardChapterFront"></div>
             <div style="display: flex; gap: 5px;">
                <div id="flashcardDifficultyFront"></div>
-                 <select id="difficulty-select">
+                 <select id="difficulty-select" onchange='updateData("dbDifficulty", this.value)'>
                    <option value="1">1</option>
                    <option value="2">2</option>
                    <option value="3">3</option>
@@ -91,7 +91,14 @@
           <div id="flashcardOtherBack">
             <div id="flashcardChapterBack"></div>
             <div style="display: flex; gap: 5px;">
-              <div id="flashcardDifficultyBack"></div><i class="fa-regular fa-pen-to-square"></i>
+              <div id="flashcardDifficultyBack"></div>
+              <select id="difficulty-select-back" onchange='updateData("dbDifficulty", this.value)'>
+                   <option value="1">1</option>
+                   <option value="2">2</option>
+                   <option value="3">3</option>
+                   <option value="4">4</option>
+                   <option value="5">5</option>
+                 </select>
             </div>
             <div id="flashcardFreqBack"></div>
           </div>
