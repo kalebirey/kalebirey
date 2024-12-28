@@ -49,6 +49,7 @@ let currentDocId; // Used for updates
 document.getElementById("group-container").addEventListener("click", function (event) {
     const clickedCard = event.target.closest(".groupCard");
     if (clickedCard) {
+        
         clickedCard.classList.toggle("active");
 
         // Check if the group is already selected
@@ -132,13 +133,7 @@ for (const docId in localCache) {
             container.appendChild(groupDiv);
         });
         
-        selectedGroups = [];
-        selectedWords = [];
-        selectedDefinitions = [];
-        selectedChapters = [];
-        selectedFrequencies = [];
-        selectedAudio = [];
-        selectedDifficulties = [];
+        clearGroups();
         
         console.log(`Words regrouped by ${groupBy} and added as attributes.`);
     } catch (error) {
@@ -154,6 +149,17 @@ function startReview() {
     const intervalOption = document.getElementById("intervalOption").value || 0;
     document.getElementById("autoplayBtn").textContent = autoplay ? "Stop autoplay" : "Start autoplay";
 
+    if (document.getElementById("advancedFilterOption").checked) {
+        const advFilter = advancedFilter();
+        
+        selectedWords = Object.values(advFilter).map(item => item.dbWord);
+        selectedDefinitions = Object.values(advFilter).map(item => item.dbMeaning);
+        selectedChapters = Object.values(advFilter).map(item => item.dbChapter);
+        selectedFrequencies = Object.values(advFilter).map(item => item.dbFrequency);
+        selectedAudio = Object.values(advFilter).map(item => item.dbAudio);
+        selectedDifficulties = Object.values(advFilter).map(item => item.dbDifficulty);
+    }
+    
     if (selectedWords.length > 0) {
         if (document.getElementById("shuffleOption").checked) {
             shuffleWordDef();
@@ -169,15 +175,14 @@ function startReview() {
     }
 }
 
-// allow user to set timer
-document.getElementById("timerOption").addEventListener("change" , function () {
-    const timerOption = document.getElementById("timerOption").parentElement;
-    const intervalOption = document.getElementById("intervalOption").parentElement;
-    timerOption.classList.toggle("noBorder");
-    intervalOption.classList.toggle("hidden");
-    if (!this.checked) {
-        pauseAutoplay();
-    }
+//some options have suboptions that are hidden until needed
+document.querySelectorAll('.option:not(.noSubOption) input[type="checkbox"]').forEach((checkbox) => {
+    checkbox.addEventListener("change", function () {
+        const parentOption = this.parentElement;
+        const siblingOption = parentOption.nextElementSibling;
+        parentOption.classList.toggle("noBorder");
+        siblingOption.classList.toggle("hidden");
+    });
 });
 
 // Start review button
@@ -449,3 +454,77 @@ function updateData(dataPoint, newData) {
       console.error(`Error updating document ${currentDocId} in Firebase:`, error);
     });
 }
+
+
+function validateInput(input) {
+  const errorSpan = document.getElementById(`${input.id}Error`);
+  errorSpan.textContent = ''; // Clear previous error
+
+  if (!input.checkValidity()) {
+    errorSpan.textContent = input.validationMessage;
+  }
+    
+    if (document.getElementById("frequencyMin").value > document.getElementById("frequencyMax").value) {
+       document.getElementById("frequencyMaxError").textContent += " Min freq must be lower than Max freq."
+   }
+    
+}
+
+function advancedFilter() {
+    const advSelectedChapters = document.getElementById("chapterSelect").selectedOptions;
+      const chapValues = Array.from(advSelectedChapters).map(option => Number(option.value));
+    const advSelectedDifficulties = document.getElementById("difficultySelect").selectedOptions;
+      const diffValues = Array.from(advSelectedDifficulties).map(option => Number(option.value));
+    const advSelectedTypes = document.getElementById("typeSelect").selectedOptions;
+      const typeValues = Array.from(advSelectedTypes).map(option => option.value);
+    const advFreqMin = document.getElementById("frequencyMin").value;
+    const advFreqMax = document.getElementById("frequencyMax").value;
+    
+    
+    return Object.fromEntries(Object.entries(localCache).filter(([key,value]) => 
+      chapValues.includes(value.dbChapter) &&
+      diffValues.includes(value.dbDifficulty) &&
+      typeValues.includes(value.dbType) &&
+      advFreqMin <= value.dbFrequency &&
+      advFreqMax >= value.dbFrequency
+      )
+    );
+}
+
+function clearGroups() {
+    document.querySelectorAll(".groupCard").forEach(card => {
+      card.classList.remove("active");
+    });
+    
+    selectedGroups = [];
+    selectedWords = [];
+    selectedDefinitions = [];
+    selectedChapters = [];
+    selectedFrequencies = [];
+    selectedAudio = [];
+    selectedDifficulties = [];
+}
+
+
+const allMultiSelects = document.querySelectorAll(".multiSelect");
+
+allMultiSelects.forEach(selectElement => {
+selectElement.addEventListener("change", (event) => {
+  const selectedValue = event.target.value;
+
+  if (selectedValue === "SelectAll") {
+    // Select all options except "Select All" and "Deselect All"
+    Array.from(selectElement.options).forEach(option => {
+      if (option.value !== "DeselectAll") {
+        option.selected = true;
+      }
+    });
+  } else if (selectedValue === "DeselectAll") {
+    // Deselect all options
+    Array.from(selectElement.options).forEach(option => {
+      option.selected = false;
+    });
+  }
+    
+});
+});
