@@ -5,6 +5,7 @@
     --blue-2: #BFD7EA; /* Soft Neutral Grey-Blue */
     --text-color: #FFFFFF; /* For high contrast text */
     --cream: #F2F6F6;
+    --grey-cream: #DADDDD;
 }
 
 html {
@@ -21,11 +22,51 @@ body {
 }
 
 
+.slide-out-tab {
+      position: fixed;
+      bottom: 0; /* Position the tab at the bottom */
+      left: 23vw; /* Center the tab horizontally */
+      transform: translateX(-50%); /* Adjust for centering */
+      width: 54vw; /* Adjust width as needed */
+      height: 30vh; /* Adjust height as needed */
+      background-color: #f2f6f6;
+      border: 1px solid #ccc;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Adjust shadow for bottom tab */
+      transition: transform 0.3s ease;
+      transform: translateY(28vh); /* Hidden by default */
+      z-index: 500;
+}
+
+.slide-out-tab.open {
+      transform: translateY(0); /* Slides out when open */
+}
+
+.slide-out-tab-handle {
+      position: absolute;
+      top: -2rem; /* Position the handle above the tab */
+      left: 50%; /* Center the handle */
+      transform: translateX(-50%);
+      background-color: var(--grey-cream);
+      color: black;
+      padding: 0.5rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px 5px 0 0;
+      cursor: pointer;
+      text-align: center;
+}
+
+.slide-out-tab-content {
+    padding: 2rem;
+    height: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
 .container {
     display: flex;
     flex-wrap: wrap; /* Allow items to wrap */
     flex: 1 1 auto;
-    gap: 1rem; /* Optional: Space between items */
+    gap: 0rem; /* Optional: Space between items */
     align-content: space-evenly;
     justify-content: space-evenly;
     background-color: var(--blue-2);
@@ -53,6 +94,7 @@ body {
     gap: 1rem;
    align-content: space-evenly;
     justify-content: space-evenly;
+    padding: 1rem 0rem;
 }
 
 #option-container {
@@ -60,6 +102,40 @@ body {
     display: block;
     gap: 1rem;
     width: 66%;
+}
+
+.tabs {
+      display: flex;
+      cursor: pointer;
+    gap: 0.5rem;
+}
+
+.tab {
+    padding: 1rem 1.5rem;
+    background-color: var(--grey-cream);
+    border: 1px solid black;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    border-bottom: none;
+}
+
+.tab.active {
+    background-color: var(--cream);
+    font-weight: bold;
+    box-shadow: 0 1px 0 0px var(--cream);
+    z-index: 1;
+}
+    
+.tab-content {
+    display: none;
+    border: 1px solid black;
+    border-radius: 0.5rem;
+    background-color: var(--cream);
+    width: 100%;
+}
+
+.tab-content.active {
+      display: block;
 }
 
 .groupCard {
@@ -97,21 +173,18 @@ body {
 .option {
     display: flex;
     flex-wrap: wrap;
+    padding: 1rem 1.5rem;
     justify-content: space-evenly;
-    margin-bottom: 1rem;
     cursor: pointer;
     border-bottom: 1px solid var(--blue-1);
 }
 
 .optionPair {
-    display: flex;
+    
     justify-content: space-between; /* Push label and input to opposite sides */
     align-items: center; /* Center items vertically */
     margin-bottom: 1rem; /* Space between optionPairs */
-    margin-left: 1rem;
     cursor: pointer;
-    width: calc(100% - 1rem);
-    box-sizing: border-box; /* Include padding/border in width */
 }
 
 #advancedOptions {
@@ -125,6 +198,7 @@ body {
 label {
     flex: 1;
     text-align: left;
+    font-weight: bold;
 }
 
 input {
@@ -140,11 +214,11 @@ select {
     text-align: center;
 }
 
-.advancedOptions {
+/*.advancedOptions {
     display: flex;
     flex-wrap: wrap;
     flex: 1;
-}
+}*/
 
 .customBtn {
     cursor: pointer;
