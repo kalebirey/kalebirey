@@ -15,16 +15,9 @@
     <div id ="loading">Loading</div>
   </div>
   
-  <h1 class="appTitle">Greek Vocab</h1>
-  
-  <div class="container">
-    <div class="containerHeader">Word Select</div>
-    <div id="group-container"></div>
-  </div>
-  
-  <div class="container">
-    <div class="containerHeader">Options</div>
-    <div id="option-container">
+  <div class="slide-out-tab" id="slideTab">
+    <div class="slide-out-tab-handle" id="tabHandle">Options</div>
+    <div class="slide-out-tab-content">
       <div class="option noSubOption">
         <label for="shuffleOption" class="optionsLabel">Shuffle Words:</label>
         <input type="checkbox" id="shuffleOption">
@@ -36,12 +29,25 @@
       </div>
     
       <div class="option hidden">
-        <label for="intervalOption" class="optionsLabel">&nbsp;&nbsp;&nbsp;&nbsp;Seconds:</label>
+        <label for="intervalOption" class="optionsLabel">Seconds:</label>
         <input type="number" value="5" min="0" max="60" id="intervalOption" onchange="validateInput(this)">
         <div id="intervalOptionError" class="error"></div>
       </div>
+    </div>
+  </div>
   
-      <div class="option">
+  <h1 class="appTitle">Greek Vocab</h1>
+  
+  <div class="container">
+    <div class="containerHeader">Word Select</div>
+    
+    <div class="tabs">
+      <div class="tab active" data-target="tab1">By Group</div>
+      <div class="tab" data-target="tab2">Advanced Filter</div>
+    </div>
+    
+    <div id="tab1" class="tab-content active">
+      <div class="option noBorder">
         <label for="group-by" class="optionsLabel">Group Words By:</label>
         <select id="group-by" onchange="regroupWords()">
           <option value="dbChapter" selected>Chapter</option>
@@ -49,13 +55,11 @@
           <option value="dbDifficulty">Difficulty</option>
         </select>
       </div>
-      
-      <div class="option">
-        <label for="advancedFilterOption" class="optionsLabel">Advanced Filter:</label>
-        <input type="checkbox" id="advancedFilterOption" onchange="clearGroups()">
-      </div>
-      
-      <div class="option hidden" id="advancedOptions">
+      <div id="group-container"></div>
+    </div>
+    
+    <div id="tab2" class="tab-content">
+      <div class="option noBorder" id="advancedOptions">
         <div class="optionPair">
           <label for="chapterSelect" class="optionsLabel">Chapter:</label>
           <select id="chapterSelect" class="multiSelect" multiple>
@@ -64,7 +68,7 @@
             <!-- Options from 1 to 36 -->
           <script>
             for (let i = 1; i <= 36; i++) {
-              document.write(`<option value="${i}" selected>${i}</option>`);
+              document.write(`<option value="${i}">${i}</option>`);
             }
           </script>
           </select>
@@ -78,7 +82,7 @@
             <!-- Options from 1 to 5 -->
           <script>
             for (let i = 1; i <= 5; i++) {
-              document.write(`<option value="${i}" selected>${i}</option>`);
+              document.write(`<option value="${i}">${i}</option>`);
             }
           </script>
           </select>
@@ -89,11 +93,11 @@
           <select id="typeSelect" class="multiSelect" multiple>
             <option value="SelectAll">Select All</option>
             <option value="DeselectAll">Deselect All</option>
-            <option value="N" selected>Noun</option>
-            <option value="A"selected>Adjective</option>
-            <option value="P" selected>Preposition</option>
-            <option value="V" selected>Verb</option>
-            <option value="O" selected>Other</option>
+            <option value="N">Noun</option>
+            <option value="A">Adjective</option>
+            <option value="P">Preposition</option>
+            <option value="V">Verb</option>
+            <option value="O">Other</option>
           </select>
         </div>
           
@@ -106,9 +110,9 @@
         <div id="frequencyMinError" class="error"></div>
         <div id="frequencyMaxError" class="error"></div>
       </div>
-      
     </div>
   </div>
+  
   
   <div class="container">
     <div class="customBtn" id="startReviewBtn">Start Review</div>
