@@ -149,7 +149,8 @@ function startReview() {
     const intervalOption = document.getElementById("intervalOption").value || 0;
     document.getElementById("autoplayBtn").textContent = autoplay ? "Stop autoplay" : "Start autoplay";
 
-    if (document.getElementById("advancedFilterOption").checked) {
+    // if user has selected the advanced filter tab
+    if (document.getElementById("tab2").classList.contains("active")) {
         const advFilter = advancedFilter();
         
         selectedWords = Object.values(advFilter).map(item => item.dbWord);
@@ -528,3 +529,29 @@ selectElement.addEventListener("change", (event) => {
     
 });
 });
+
+
+
+// JavaScript to handle tab switching
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs and contents
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+
+        // Add active class to clicked tab and corresponding content
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.target).classList.add('active');
+      });
+    });
+
+
+// Toggle the slide-out tab when the handle is clicked
+    document.getElementById('tabHandle').addEventListener('click', function () {
+      const tab = document.getElementById('slideTab');
+      tab.classList.toggle('open');
+    });
+
